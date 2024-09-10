@@ -1,19 +1,24 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import {
+	Entity,
+	Column,
+	PrimaryGeneratedColumn,
+	CreateDateColumn
+} from 'typeorm'
 
 @Entity()
-export class Message {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class MessageEntity {
+	@PrimaryGeneratedColumn()
+	id: number
 
-  @Column()
-  senderId: number;
+	@Column()
+	senderId: number
 
-  @Column()
-  receiverId: number;
+	@Column()
+	receiverId: number
 
-  @Column()
-  content: string;
+	@Column()
+	content: string
 
-  @CreateDateColumn()
-  createdAt: Date;
+	@CreateDateColumn()
+	createdAt: Date
 }
