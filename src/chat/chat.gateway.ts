@@ -45,14 +45,17 @@ export class ChatGateway {
 
 			await this.chatService.updateLastMessage(chatId, message.content)
 
+			const sender = await this.userService.findOne(
+				savedMessage.senderId.toString()
+			)
+			const receiver = await this.userService.findOne(
+				savedMessage.receiverId.toString()
+			)
+
 			const messageWithUsers = {
 				...savedMessage,
-				sender: await this.userService.findOne(
-					savedMessage.senderId.toString()
-				),
-				receiver: await this.userService.findOne(
-					savedMessage.receiverId.toString()
-				)
+				sender,
+				receiver
 			}
 
 			this.server.emit('receiveMessage', messageWithUsers)
@@ -64,15 +67,13 @@ export class ChatGateway {
 
 			await this.chatService.updateLastMessage(chatId, message.content)
 
-			// Include user details in the emitted message
+			const sender = await this.userService.findBuId(savedMessage.senderId)
+			const receiver = await this.userService.findBuId(savedMessage.receiverId)
+
 			const messageWithUsers = {
 				...savedMessage,
-				sender: await this.userService.findOne(
-					savedMessage.senderId.toString()
-				),
-				receiver: await this.userService.findOne(
-					savedMessage.receiverId.toString()
-				)
+				sender,
+				receiver
 			}
 
 			this.server.emit('receiveMessage', messageWithUsers)
