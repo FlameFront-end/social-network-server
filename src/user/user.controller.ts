@@ -68,6 +68,23 @@ export class UserController {
 		}
 	}
 
+	@Patch('send-friend-request/:friendId')
+	@UseGuards(JwtAuthGuard)
+	async sendFriendRequest(@Request() req, @Param('friendId') friendId: string) {
+		await this.userService.sendFriendRequest(req.user.id, +friendId)
+		return { message: 'Friend request sent' }
+	}
+
+	@Patch('accept-friend-request/:friendId')
+	@UseGuards(JwtAuthGuard)
+	async acceptFriendRequest(
+		@Request() req,
+		@Param('friendId') friendId: string
+	) {
+		await this.userService.acceptFriendRequest(req.user.id, +friendId)
+		return { message: 'Friend request accepted' }
+	}
+
 	@Get(':id')
 	findOne(@Param('id') id: string) {
 		return this.userService.findBuId(+id)

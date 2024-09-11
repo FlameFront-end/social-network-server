@@ -19,21 +19,19 @@ export class ChatService {
 		content: string
 		chatId: number
 	}) {
-		console.log('messageData', messageData)
 		const messageEntity = this.messageRepository.create(messageData)
 		return await this.messageRepository.save(messageEntity)
 	}
 
 	async getMessagesBetweenUsers(userId1: number, userId2: number) {
-		const messages = await this.messageRepository.find({
+		return await this.messageRepository.find({
 			where: [
 				{ senderId: userId1, receiverId: userId2 },
 				{ senderId: userId2, receiverId: userId1 }
 			],
-			relations: ['sender', 'receiver'], // Include user details
+			relations: ['sender', 'receiver'],
 			order: { createdAt: 'ASC' }
 		})
-		return messages
 	}
 
 	async getChatId(

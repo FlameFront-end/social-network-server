@@ -4,7 +4,7 @@ import {
 	Column,
 	CreateDateColumn,
 	UpdateDateColumn,
-	OneToMany
+	ManyToMany
 } from 'typeorm'
 import { MessageEntity } from '../../chat/entities/message.entity'
 import { ChatEntity } from '../../chat/entities/chat.entity'
@@ -44,15 +44,24 @@ export class UserEntity {
 	@UpdateDateColumn()
 	updatedAt: Date
 
-	@OneToMany(() => MessageEntity, message => message.sender)
+	@ManyToMany(() => MessageEntity, message => message.sender)
 	sentMessages: MessageEntity[]
 
-	@OneToMany(() => MessageEntity, message => message.receiver)
+	@ManyToMany(() => MessageEntity, message => message.receiver)
 	receivedMessages: MessageEntity[]
 
-	@OneToMany(() => ChatEntity, chat => chat.user1)
+	@ManyToMany(() => ChatEntity, chat => chat.user1)
 	chatsAsUser1: ChatEntity[]
 
-	@OneToMany(() => ChatEntity, chat => chat.user2)
+	@ManyToMany(() => ChatEntity, chat => chat.user2)
 	chatsAsUser2: ChatEntity[]
+
+	@Column({ type: 'json', nullable: true })
+	outgoingFriendRequests: number[]
+
+	@Column({ type: 'json', nullable: true })
+	incomingFriendRequests: number[]
+
+	@Column({ type: 'json', nullable: true })
+	friends: number[]
 }

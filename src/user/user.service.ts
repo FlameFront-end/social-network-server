@@ -27,9 +27,9 @@ export class UserService {
 		}
 
 		const user = await this.userRepository.save({
+			...createUserDto,
 			password: await argon2.hash(createUserDto.password),
-			isAdmin: createUserDto.email === '5017_30@mail.ru',
-			...createUserDto
+			isAdmin: createUserDto.email === '5017_30@mail.ru'
 		})
 
 		const token = this.jwtService.sign({ email: createUserDto.email })
@@ -67,5 +67,79 @@ export class UserService {
 	async resetPassword(user: IUser, newPassword: string): Promise<void> {
 		const hashedNewPassword = await argon2.hash(newPassword)
 		await this.updatePassword(user.id, hashedNewPassword)
+	}
+
+	async sendFriendRequest(userId: number, friendId: number) {
+		const user = await this.userRepository.findOne({
+			where: { id: userId }
+		})
+
+		const friend = await this.userRepository.findOne({
+			where: { id: friendId }
+		})
+
+		if (!user || !friend) {
+			throw new BadRequestException('Пользователь не найден')
+		}
+
+		if (
+			user.outgoingFriendRequests &&
+			user.outgoingFriendRequests.includes(friendId)
+		) {
+			throw new BadRequestException('Запрос на дружбу уже отправлен')
+		}
+
+		user.outgoingFriendRequests = user.outgoingFriendRequests || []
+		user.outgoingFriendRequests.push(friendId)
+		await this.userRepository.save(user)
+
+		friend.incomingFriendRequests = friend.incomingFriendRequests || []
+		friend.incomingFriendRequests.push(userId)
+		await this.userRepository.save(friend)
+	}
+
+	async acceptFriendRequest(userId: number, friendId: number) {
+		const user = await this.userRepository.findOne({
+			where: { id: userId }
+		})
+
+		const friend = await this.userRepository.findOne({
+			where: { id: friendId }
+		})
+
+		if (!user || !friend) {
+			throw new BadRequestException('Пользователь не найден')
+		}
+
+		if (
+			!user.incomingFriendRequests ||
+			!user.incomingFriendRequests.includes(friendId)
+		) {
+			throw new BadRequestException('Запрос на дружбу не найден')
+		}
+
+		user.incomingFriendRequests = user.incomingFriendRequests.filter(
+			id => id !== friendId
+		)
+
+		if (friend.outgoingFriendRequests) {
+			friend.outgoingFriendRequests = friend.outgoingFriendRequests.filter(
+				id => id !== userId
+			)
+		}
+
+		user.friends = user.friends || []
+		friend.friends = friend.friends || []
+
+		if (!user.friends.includes(friendId)) {
+			user.friends.push(friendId)
+		}
+
+		if (!friend.friends.includes(userId)) {
+			friend.friends.push(userId)
+		}
+
+		await this.userRepository.save(user)
+		await this.userRepository.save(friend)
 	}
 }
