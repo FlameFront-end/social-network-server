@@ -17,4 +17,9 @@ export class ChatController {
 			Number(userId2)
 		)
 	}
+
+	@Get(':userId')
+	getAllChats(@Param('userId') userId: string) {
+		return this.chatService.getAllChatsForUser(Number(userId))
+	}
 }

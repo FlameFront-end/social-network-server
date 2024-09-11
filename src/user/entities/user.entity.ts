@@ -3,8 +3,11 @@ import {
 	PrimaryGeneratedColumn,
 	Column,
 	CreateDateColumn,
-	UpdateDateColumn
+	UpdateDateColumn,
+	OneToMany
 } from 'typeorm'
+import { MessageEntity } from '../../chat/entities/message.entity'
+import { ChatEntity } from '../../chat/entities/chat.entity'
 
 @Entity('user')
 export class UserEntity {
@@ -26,10 +29,21 @@ export class UserEntity {
 	@Column({ default: false })
 	isAdmin: boolean
 
-
 	@CreateDateColumn()
 	createdAt: Date
 
 	@UpdateDateColumn()
 	updatedAt: Date
+
+	@OneToMany(() => MessageEntity, message => message.sender)
+	sentMessages: MessageEntity[]
+
+	@OneToMany(() => MessageEntity, message => message.receiver)
+	receivedMessages: MessageEntity[]
+
+	@OneToMany(() => ChatEntity, chat => chat.user1)
+	chatsAsUser1: ChatEntity[]
+
+	@OneToMany(() => ChatEntity, chat => chat.user2)
+	chatsAsUser2: ChatEntity[]
 }
