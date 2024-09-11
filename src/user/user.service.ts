@@ -23,15 +23,13 @@ export class UserService {
 		})
 
 		if (existUser) {
-			throw new BadRequestException('This email already exists')
+			throw new BadRequestException('Эта почта уже занята')
 		}
 
 		const user = await this.userRepository.save({
-			email: createUserDto.email,
 			password: await argon2.hash(createUserDto.password),
-			nick: createUserDto.nick,
-			ava: createUserDto.ava,
-			isAdmin: createUserDto.email === '5017_30@mail.ru'
+			isAdmin: createUserDto.email === '5017_30@mail.ru',
+			...createUserDto
 		})
 
 		const token = this.jwtService.sign({ email: createUserDto.email })
@@ -44,13 +42,13 @@ export class UserService {
 
 	async findOne(email: string) {
 		return await this.userRepository.findOne({
-			where: { email: email },
+			where: { email: email }
 		})
 	}
 
 	async findBuId(id: number) {
 		return await this.userRepository.findOne({
-			where: { id },
+			where: { id }
 		})
 	}
 

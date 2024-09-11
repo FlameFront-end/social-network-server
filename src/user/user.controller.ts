@@ -30,7 +30,13 @@ export class UserController {
 				ava: {
 					type: 'string'
 				},
-				nick: {
+				surname: {
+					type: 'string'
+				},
+				name: {
+					type: 'string'
+				},
+				patronymic: {
 					type: 'string'
 				},
 				email: {

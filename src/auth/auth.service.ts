@@ -19,16 +19,18 @@ export class AuthService {
 			return user
 		}
 
-		throw new UnauthorizedException('User or password are incorrect!')
+		throw new UnauthorizedException('Неверная почта или пароль!')
 	}
 
 	async login(user: IUser) {
-		const { id, email, nick, ava } = user
+		const { id, email, surname, patronymic, name, ava } = user
 
 		return {
 			id,
-			nick,
 			ava,
+			surname,
+			patronymic,
+			name,
 			email,
 			token: this.jwtService.sign({ id: user.id, email: user.email })
 		}

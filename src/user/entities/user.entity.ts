@@ -21,9 +21,18 @@ export class UserEntity {
 	password: string
 
 	@Column()
-	nick: string
+	surname: string
 
 	@Column()
+	name: string
+
+	@Column({ nullable: true })
+	patronymic: string
+
+	@Column({ nullable: true })
+	birthdate: string
+
+	@Column({ nullable: true })
 	ava: string
 
 	@Column({ default: false })
