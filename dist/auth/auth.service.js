@@ -28,9 +28,11 @@ let AuthService = class AuthService {
         throw new common_1.UnauthorizedException('User or password are incorrect!');
     }
     async login(user) {
-        const { id, email } = user;
+        const { id, email, nick, ava } = user;
         return {
             id,
+            nick,
+            ava,
             email,
             token: this.jwtService.sign({ id: user.id, email: user.email })
         };

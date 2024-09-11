@@ -8,6 +8,8 @@ export declare class AuthService {
     validateUser(email: string, password: string): Promise<import("../user/entities/user.entity").UserEntity>;
     login(user: IUser): Promise<{
         id: number;
+        nick: string;
+        ava: string;
         email: string;
         token: string;
     }>;
