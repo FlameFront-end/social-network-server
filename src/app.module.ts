@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MessageEntity } from './chat/message.entity'
 import { ChatModule } from './chat/chat.module'
 import { ChatService } from './chat/chat.service'
+import { UploadModule } from './upload/upload.module';
 
 
 @Module({
@@ -27,7 +28,8 @@ import { ChatService } from './chat/chat.service'
 			}),
 			inject: [ConfigService]
 		}),
-		ChatModule
+		ChatModule,
+		UploadModule
 	],
 	controllers: [],
 })

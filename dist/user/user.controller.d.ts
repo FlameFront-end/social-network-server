@@ -4,7 +4,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 export declare class UserController {
     private readonly userService;
     constructor(userService: UserService);
-    create(ava: Express.Multer.File, createUserDto: CreateUserDto): Promise<{
+    create(createUserDto: CreateUserDto): Promise<{
         token: string;
         email: string;
         password: string;

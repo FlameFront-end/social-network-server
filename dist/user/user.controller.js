@@ -17,8 +17,6 @@ const common_1 = require("@nestjs/common");
 const user_service_1 = require("./user.service");
 const create_user_dto_1 = require("./dto/create-user.dto");
 const swagger_1 = require("@nestjs/swagger");
-const platform_express_1 = require("@nestjs/platform-express");
-const storage_1 = require("../storage");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const argon2 = require("argon2");
 const reset_password_dto_1 = require("./dto/reset-password.dto");
@@ -26,11 +24,8 @@ let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
     }
-    create(ava, createUserDto) {
-        return this.userService.create({
-            ...createUserDto,
-            ava: `http://localhost:3000/uploads/ava/${ava.filename}`
-        });
+    create(createUserDto) {
+        return this.userService.create(createUserDto);
     }
     async resetPassword(req, body) {
         const { old_password, new_password } = body;
@@ -54,17 +49,13 @@ let UserController = class UserController {
 exports.UserController = UserController;
 __decorate([
     (0, common_1.Post)('/register'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('ava', {
-        storage: storage_1.avaStorage
-    })),
     (0, swagger_1.ApiConsumes)('multipart/form-data'),
     (0, swagger_1.ApiBody)({
         schema: {
             type: 'object',
             properties: {
                 ava: {
-                    type: 'string',
-                    format: 'binary'
+                    type: 'string'
                 },
                 nick: {
                     type: 'string'
@@ -78,11 +69,9 @@ __decorate([
             }
         }
     }),
-    (0, common_1.UsePipes)(new common_1.ValidationPipe()),
-    __param(0, (0, common_1.UploadedFile)()),
-    __param(1, (0, common_1.Body)()),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, create_user_dto_1.CreateUserDto]),
+    __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "create", null);
 __decorate([

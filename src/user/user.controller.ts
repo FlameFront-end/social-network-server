@@ -7,17 +7,11 @@ import {
 	Post,
 	Request,
 	UnauthorizedException,
-	UploadedFile,
-	UseGuards,
-	UseInterceptors,
-	UsePipes,
-	ValidationPipe
+	UseGuards
 } from '@nestjs/common'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
-import { FileInterceptor } from '@nestjs/platform-express'
-import { avaStorage } from '../storage'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import * as argon2 from 'argon2'
 import { ResetPasswordDto } from './dto/reset-password.dto'
@@ -28,19 +22,13 @@ export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Post('/register')
-	@UseInterceptors(
-		FileInterceptor('ava', {
-			storage: avaStorage
-		})
-	)
 	@ApiConsumes('multipart/form-data')
 	@ApiBody({
 		schema: {
 			type: 'object',
 			properties: {
 				ava: {
-					type: 'string',
-					format: 'binary'
+					type: 'string'
 				},
 				nick: {
 					type: 'string'
@@ -54,16 +42,8 @@ export class UserController {
 			}
 		}
 	})
-	@UsePipes(new ValidationPipe())
-	create(
-		@UploadedFile()
-		ava: Express.Multer.File,
-		@Body() createUserDto: CreateUserDto
-	) {
-		return this.userService.create({
-			...createUserDto,
-			ava: `http://localhost:3000/uploads/ava/${ava.filename}`
-		})
+	create(@Body() createUserDto: CreateUserDto) {
+		return this.userService.create(createUserDto)
 	}
 
 	@Patch('reset-password')

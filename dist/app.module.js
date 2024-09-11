@@ -15,6 +15,7 @@ const user_module_1 = require("./user/user.module");
 const config_1 = require("@nestjs/config");
 const message_entity_1 = require("./chat/message.entity");
 const chat_module_1 = require("./chat/chat.module");
+const upload_module_1 = require("./upload/upload.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -37,7 +38,8 @@ exports.AppModule = AppModule = __decorate([
                 }),
                 inject: [config_1.ConfigService]
             }),
-            chat_module_1.ChatModule
+            chat_module_1.ChatModule,
+            upload_module_1.UploadModule
         ],
         controllers: [],
     })
