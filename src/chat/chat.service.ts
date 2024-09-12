@@ -18,6 +18,7 @@ export class ChatService {
 		receiverId: number
 		content: string
 		chatId: number
+		audioUrl?: string
 	}) {
 		const messageEntity = this.messageRepository.create(messageData)
 		return await this.messageRepository.save(messageEntity)

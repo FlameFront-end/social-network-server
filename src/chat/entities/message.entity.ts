@@ -19,8 +19,11 @@ export class MessageEntity {
 	@Column()
 	receiverId: number
 
-	@Column()
+	@Column({ default: null })
 	content: string
+
+	@Column({ default: null })
+	audioUrl?: string
 
 	@Column()
 	chatId: number
