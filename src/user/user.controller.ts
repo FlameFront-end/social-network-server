@@ -52,7 +52,7 @@ export class UserController {
 		return this.userService.create(createUserDto)
 	}
 
-	@Patch('reset-password')
+	@Patch('/reset-password')
 	@UseGuards(JwtAuthGuard)
 	async resetPassword(@Request() req, @Body() body: ResetPasswordDto) {
 		const { old_password, new_password } = body
@@ -68,14 +68,14 @@ export class UserController {
 		}
 	}
 
-	@Patch('send-friend-request/:friendId')
+	@Patch('/send-friend-request/:friendId')
 	@UseGuards(JwtAuthGuard)
 	async sendFriendRequest(@Request() req, @Param('friendId') friendId: string) {
 		await this.userService.sendFriendRequest(req.user.id, +friendId)
 		return { message: 'Friend request sent' }
 	}
 
-	@Patch('accept-friend-request/:friendId')
+	@Patch('/accept-friend-request/:friendId')
 	@UseGuards(JwtAuthGuard)
 	async acceptFriendRequest(
 		@Request() req,
@@ -85,13 +85,19 @@ export class UserController {
 		return { message: 'Friend request accepted' }
 	}
 
-	@Get(':id')
-	findOne(@Param('id') id: string) {
-		return this.userService.findBuId(+id)
+	@Get('/other')
+	@UseGuards(JwtAuthGuard)
+	async getOtherUsers(@Request() req) {
+		return await this.userService.getOtherUsers(req.user.id)
 	}
 
-	@Get()
-	findAll() {
-		return this.userService.findAll()
+	@Get('/all')
+	async getAllUsers() {
+		return await this.userService.getAllUsers()
+	}
+
+	@Get(':id')
+	async findOne(@Param('id') id: string) {
+		return this.userService.findBuId(+id)
 	}
 }

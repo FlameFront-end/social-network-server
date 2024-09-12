@@ -52,8 +52,13 @@ export class UserService {
 		})
 	}
 
-	async findAll() {
+	async getAllUsers() {
 		return await this.userRepository.find()
+	}
+
+	async getOtherUsers(userId: number) {
+		const allUsers = await this.userRepository.find()
+		return allUsers.filter(user => user.id !== userId)
 	}
 
 	async getUserByEmail(email: string) {
