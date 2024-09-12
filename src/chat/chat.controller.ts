@@ -1,11 +1,26 @@
-import { Controller, Get, Param } from '@nestjs/common'
+import {
+	Body,
+	Controller,
+	Get,
+	Param,
+	Post,
+	Request,
+	UseGuards
+} from '@nestjs/common'
 import { ChatService } from './chat.service'
 import { ApiTags } from '@nestjs/swagger'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 
 @ApiTags('chat')
 @Controller('chat')
 export class ChatController {
 	constructor(private readonly chatService: ChatService) {}
+
+	@Post('/create')
+	@UseGuards(JwtAuthGuard)
+	createChat(@Request() req, @Body() receiverId: number) {
+		return this.chatService.createChat(req.user.id, receiverId)
+	}
 
 	@Get(':userId1/:userId2')
 	getMessagesBetweenUsers(
@@ -18,8 +33,9 @@ export class ChatController {
 		)
 	}
 
-	@Get(':userId')
-	getAllChats(@Param('userId') userId: string) {
-		return this.chatService.getAllChatsForUser(Number(userId))
+	@Get('/my-chats')
+	@UseGuards(JwtAuthGuard)
+	getAllChats(@Request() req) {
+		return this.chatService.getAllChatsForUser(req.user.id)
 	}
 }

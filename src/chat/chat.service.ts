@@ -48,12 +48,12 @@ export class ChatService {
 		return chat ? chat.id : null
 	}
 
-	async createChat(senderId: number, receiverId: number): Promise<void> {
+	async createChat(senderId: number, receiverId: number): Promise<ChatEntity> {
 		const newChat = this.chatRepository.create({
 			user1Id: senderId,
 			user2Id: receiverId
 		})
-		await this.chatRepository.save(newChat)
+		return await this.chatRepository.save(newChat)
 	}
 
 	async updateLastMessage(chatId: number, lastMessage: string) {

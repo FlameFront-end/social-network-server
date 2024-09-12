@@ -88,6 +88,7 @@ export class UserController {
 	@Get('/other')
 	@UseGuards(JwtAuthGuard)
 	async getOtherUsers(@Request() req) {
+		console.log('req.user.id', req.user)
 		return await this.userService.getOtherUsers(req.user.id)
 	}
 
