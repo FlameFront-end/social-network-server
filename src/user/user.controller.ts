@@ -85,16 +85,21 @@ export class UserController {
 		return { message: 'Friend request accepted' }
 	}
 
-	@Get('/other')
+	@Get('/possible-friends')
 	@UseGuards(JwtAuthGuard)
-	async getOtherUsers(@Request() req) {
-		console.log('req.user.id', req.user)
-		return await this.userService.getOtherUsers(req.user.id)
+	async getPossibleFriends(@Request() req) {
+		return await this.userService.getPossibleFriends(req.user.id)
 	}
 
 	@Get('/all')
 	async getAllUsers() {
 		return await this.userService.getAllUsers()
+	}
+
+	@Get('/my-friends')
+	@UseGuards(JwtAuthGuard)
+	async getMyFriends(@Request() req) {
+		return await this.userService.getMyFriends(req.user.id)
 	}
 
 	@Get(':id')

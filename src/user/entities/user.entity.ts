@@ -56,12 +56,12 @@ export class UserEntity {
 	@ManyToMany(() => ChatEntity, chat => chat.user2)
 	chatsAsUser2: ChatEntity[]
 
-	@Column({ type: 'json', nullable: true })
+	@Column({ type: 'json', default: [] })
 	outgoingFriendRequests: number[]
 
-	@Column({ type: 'json', nullable: true })
+	@Column({ type: 'json', default: [] })
 	incomingFriendRequests: number[]
 
-	@Column({ type: 'json', nullable: true })
+	@Column({ type: 'json', default: [] })
 	friends: number[]
 }

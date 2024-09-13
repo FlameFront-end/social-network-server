@@ -56,9 +56,21 @@ export class UserService {
 		return await this.userRepository.find()
 	}
 
-	async getOtherUsers(userId: number) {
+	async getPossibleFriends(userId: number) {
 		const allUsers = await this.userRepository.find()
-		return allUsers.filter(user => user.id !== userId)
+		return allUsers.filter(
+			user => user.id !== userId && !user.friends.includes(userId)
+		)
+	}
+
+	async getMyFriends(userId: number) {
+		const user = await this.userRepository.findOne({
+			where: { id: userId }
+		})
+
+		const friendIds = user.friends
+
+		return await this.userRepository.findByIds(friendIds)
 	}
 
 	async getUserByEmail(email: string) {
