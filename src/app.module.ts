@@ -3,13 +3,15 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { AuthModule } from './auth/auth.module'
 import { UserEntity } from './user/entities/user.entity'
 import { UserModule } from './user/user.module'
-import { ConfigModule, ConfigService } from '@nestjs/config'
+import { ConfigModule } from '@nestjs/config'
 import { ChatModule } from './chat/chat.module'
 import { ChatService } from './chat/chat.service'
 import { UploadModule } from './upload/upload.module'
 import { ChatGateway } from './chat/chat.gateway'
 import { ChatEntity } from './chat/entities/chat.entity'
 import { MessageEntity } from './chat/entities/message.entity'
+import { ServeStaticModule } from '@nestjs/serve-static'
+import * as path from 'path'
 
 @Module({
 	imports: [
@@ -17,19 +19,21 @@ import { MessageEntity } from './chat/entities/message.entity'
 		AuthModule,
 		ChatModule,
 		UploadModule,
-		ConfigModule.forRoot({ isGlobal: true }),
-		TypeOrmModule.forRootAsync({
-			imports: [ConfigModule],
-			useFactory: (configService: ConfigService) => ({
-				type: 'postgres',
-				host: configService.get('DATABASE_HOST'),
-				username: configService.get('DATABASE_USERNAME'),
-				password: configService.get('DATABASE_PASSWORD'),
-				database: configService.get('DATABASE_NAME'),
-				entities: [MessageEntity, ChatEntity, UserEntity],
-				synchronize: true
-			}),
-			inject: [ConfigService]
+		ServeStaticModule.forRoot({
+			rootPath: path.resolve(__dirname, 'static')
+		}),
+		ConfigModule.forRoot({
+			envFilePath: `.env.${process.env.NODE_ENV}`
+		}),
+		TypeOrmModule.forRoot({
+			type: 'postgres',
+			host: process.env.POSTGRES_HOST,
+			port: Number(process.env.POSTGRESS_PORT),
+			username: process.env.POSTGRES_USER,
+			password: process.env.POSTGRESS_PASSWORD,
+			database: process.env.POSTGRES_DB,
+			entities: [MessageEntity, ChatEntity, UserEntity],
+			synchronize: true
 		}),
 		TypeOrmModule.forFeature([MessageEntity, ChatEntity, UserEntity])
 	],

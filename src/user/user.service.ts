@@ -115,6 +115,39 @@ export class UserService {
 		await this.userRepository.save(friend)
 	}
 
+	async removeFriendRequest(userId: number, friendId: number) {
+		const user = await this.userRepository.findOne({
+			where: { id: userId }
+		})
+
+		const friend = await this.userRepository.findOne({
+			where: { id: friendId }
+		})
+
+		if (!user || !friend) {
+			throw new BadRequestException('Пользователь не найден')
+		}
+
+		if (
+			!user.outgoingFriendRequests ||
+			!user.outgoingFriendRequests.includes(friendId)
+		) {
+			throw new BadRequestException('Запрос на дружбу не найден')
+		}
+
+		user.outgoingFriendRequests = user.outgoingFriendRequests.filter(
+			id => id !== friendId
+		)
+		await this.userRepository.save(user)
+
+		if (friend.incomingFriendRequests) {
+			friend.incomingFriendRequests = friend.incomingFriendRequests.filter(
+				id => id !== userId
+			)
+			await this.userRepository.save(friend)
+		}
+	}
+
 	async acceptFriendRequest(userId: number, friendId: number) {
 		const user = await this.userRepository.findOne({
 			where: { id: userId }

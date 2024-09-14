@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	Param,
 	Patch,
@@ -73,6 +74,16 @@ export class UserController {
 	async sendFriendRequest(@Request() req, @Param('friendId') friendId: string) {
 		await this.userService.sendFriendRequest(req.user.id, +friendId)
 		return { message: 'Friend request sent' }
+	}
+
+	@Delete('/remove-friend-request/:friendId')
+	@UseGuards(JwtAuthGuard)
+	async removeFriendRequest(
+		@Request() req,
+		@Param('friendId') friendId: string
+	) {
+		await this.userService.removeFriendRequest(req.user.id, +friendId)
+		return { message: 'Friend request remove' }
 	}
 
 	@Patch('/accept-friend-request/:friendId')
