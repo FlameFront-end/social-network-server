@@ -23,7 +23,6 @@ export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Post('/register')
-	@ApiConsumes('multipart/form-data')
 	@ApiBody({
 		schema: {
 			type: 'object',
@@ -43,6 +42,10 @@ export class UserController {
 				email: {
 					type: 'string'
 				},
+				birthdate: {
+					type: 'string',
+					default: '24.09.2004'
+				},
 				password: {
 					type: 'string'
 				}
@@ -50,6 +53,7 @@ export class UserController {
 		}
 	})
 	create(@Body() createUserDto: CreateUserDto) {
+		console.log('createUserDto', createUserDto)
 		return this.userService.create(createUserDto)
 	}
 

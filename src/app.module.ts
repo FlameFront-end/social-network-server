@@ -11,6 +11,7 @@ import { ChatGateway } from './chat/chat.gateway'
 import { ChatEntity } from './chat/entities/chat.entity'
 import { MessageEntity } from './chat/entities/message.entity'
 import { ServeStaticModule } from '@nestjs/serve-static'
+import { FilesModule } from './files/files.module';
 import * as path from 'path'
 
 @Module({
@@ -35,7 +36,8 @@ import * as path from 'path'
 			entities: [MessageEntity, ChatEntity, UserEntity],
 			synchronize: true
 		}),
-		TypeOrmModule.forFeature([MessageEntity, ChatEntity, UserEntity])
+		TypeOrmModule.forFeature([MessageEntity, ChatEntity, UserEntity]),
+		FilesModule
 	],
 	controllers: [],
 	providers: [ChatGateway, ChatService]

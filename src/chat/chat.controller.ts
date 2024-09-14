@@ -18,8 +18,8 @@ export class ChatController {
 
 	@Post('/create')
 	@UseGuards(JwtAuthGuard)
-	createChat(@Request() req, @Body() receiverId: number) {
-		return this.chatService.createChat(req.user.id, receiverId)
+	createChat(@Request() req, @Body() body: { receiverId: number }) {
+		return this.chatService.createChat(req.user.id, body.receiverId)
 	}
 
 	@Get(':userId1/:userId2')

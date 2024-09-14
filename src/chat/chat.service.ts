@@ -53,6 +53,9 @@ export class ChatService {
 			user1Id: senderId,
 			user2Id: receiverId
 		})
+
+		console.log('newChat', newChat)
+
 		return await this.chatRepository.save(newChat)
 	}
 

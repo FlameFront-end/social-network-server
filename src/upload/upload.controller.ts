@@ -1,42 +1,41 @@
-import { Controller, Post, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { avaStorage } from '../storage';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import {
+	BadRequestException,
+	Controller,
+	Post,
+	Req,
+	UploadedFile,
+	UseInterceptors
+} from '@nestjs/common'
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
+import { FilesService } from '../files/files.service'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { Request } from 'express'
 
 @ApiTags('upload')
 @Controller('upload')
 export class UploadController {
-  @Post('image')
-  @UseInterceptors(
-    FileInterceptor('ava', {
-      storage: avaStorage,
-      fileFilter: (_, file, cb) => {
-        if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
-          cb(new BadRequestException('Unsupported file type'), false);
-        }
-        cb(null, true);
-      },
-      limits: {
-        fileSize: 5 * 1024 * 1024,
-      },
-    })
-  )
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        ava: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  create(@UploadedFile() ava: Express.Multer.File) {
-    if (!ava) {
-      throw new BadRequestException('File upload failed');
-    }
-    return { url: `http://localhost:3000/uploads/ava/${ava.filename}` };
-  }
+	constructor(private readonly fileService: FilesService) {}
+
+	@Post('image')
+	@ApiConsumes('multipart/form-data')
+	@ApiBody({
+		schema: {
+			type: 'object',
+			properties: {
+				ava: {
+					type: 'string',
+					format: 'binary'
+				}
+			}
+		}
+	})
+	@UseInterceptors(FileInterceptor('ava'))
+	async create(@UploadedFile() ava: Express.Multer.File, @Req() req: Request) {
+		if (!ava) {
+			throw new BadRequestException('File upload failed')
+		}
+		const fileName = await this.fileService.createFile(ava)
+		const fileUrl = `${req.protocol}://${req.get('host')}/${fileName}`
+		return { url: fileUrl }
+	}
 }
