@@ -9,16 +9,15 @@ import {
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { Request } from 'express'
-import { avaStorage } from '../storage'
-import * as uuid from 'uuid'
+import { imagesStorage } from '../storage'
 
 @ApiTags('upload')
 @Controller('upload')
 export class UploadController {
 	@Post('image')
 	@UseInterceptors(
-		FileInterceptor('ava', {
-			storage: avaStorage,
+		FileInterceptor('image', {
+			storage: imagesStorage,
 			fileFilter: (_, file, cb) => {
 				if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
 					cb(new BadRequestException('Unsupported file type'), false)
@@ -35,22 +34,22 @@ export class UploadController {
 		schema: {
 			type: 'object',
 			properties: {
-				ava: {
+				image: {
 					type: 'string',
 					format: 'binary'
 				}
 			}
 		}
 	})
-	async create(@UploadedFile() ava: Express.Multer.File, @Req() req: Request) {
-		if (!ava) {
+	async create(
+		@UploadedFile() image: Express.Multer.File,
+		@Req() req: Request
+	) {
+		if (!image) {
 			throw new BadRequestException('File upload failed')
 		}
 
-		const fileExtension = ava.filename.split('.').pop()
-		const fileName = `${uuid.v4()}.${fileExtension}`
-
-		const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${fileName}`
+		const fileUrl = `${req.protocol}://${req.get('host')}/uploads/images/${image.filename}`
 		return { url: fileUrl }
 	}
 }
