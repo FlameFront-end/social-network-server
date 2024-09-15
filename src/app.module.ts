@@ -10,6 +10,7 @@ import { UploadModule } from './upload/upload.module'
 import { ChatGateway } from './chat/chat.gateway'
 import { ChatEntity } from './chat/entities/chat.entity'
 import { MessageEntity } from './chat/entities/message.entity'
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
 	imports: [
@@ -30,7 +31,8 @@ import { MessageEntity } from './chat/entities/message.entity'
 			entities: [MessageEntity, ChatEntity, UserEntity],
 			synchronize: true
 		}),
-		TypeOrmModule.forFeature([MessageEntity, ChatEntity, UserEntity])
+		TypeOrmModule.forFeature([MessageEntity, ChatEntity, UserEntity]),
+		FriendsModule
 	],
 	controllers: [],
 	providers: [ChatGateway, ChatService]

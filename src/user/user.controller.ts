@@ -1,7 +1,6 @@
 import {
 	Body,
 	Controller,
-	Delete,
 	Get,
 	Param,
 	Patch,
@@ -12,7 +11,7 @@ import {
 } from '@nestjs/common'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/create-user.dto'
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import * as argon2 from 'argon2'
 import { ResetPasswordDto } from './dto/reset-password.dto'
@@ -53,7 +52,6 @@ export class UserController {
 		}
 	})
 	create(@Body() createUserDto: CreateUserDto) {
-		console.log('createUserDto', createUserDto)
 		return this.userService.create(createUserDto)
 	}
 
@@ -73,48 +71,9 @@ export class UserController {
 		}
 	}
 
-	@Patch('/send-friend-request/:friendId')
-	@UseGuards(JwtAuthGuard)
-	async sendFriendRequest(@Request() req, @Param('friendId') friendId: string) {
-		await this.userService.sendFriendRequest(req.user.id, +friendId)
-		return { message: 'Friend request sent' }
-	}
-
-	@Delete('/remove-friend-request/:friendId')
-	@UseGuards(JwtAuthGuard)
-	async removeFriendRequest(
-		@Request() req,
-		@Param('friendId') friendId: string
-	) {
-		await this.userService.removeFriendRequest(req.user.id, +friendId)
-		return { message: 'Friend request remove' }
-	}
-
-	@Patch('/accept-friend-request/:friendId')
-	@UseGuards(JwtAuthGuard)
-	async acceptFriendRequest(
-		@Request() req,
-		@Param('friendId') friendId: string
-	) {
-		await this.userService.acceptFriendRequest(req.user.id, +friendId)
-		return { message: 'Friend request accepted' }
-	}
-
-	@Get('/possible-friends')
-	@UseGuards(JwtAuthGuard)
-	async getPossibleFriends(@Request() req) {
-		return await this.userService.getPossibleFriends(req.user.id)
-	}
-
 	@Get('/all')
 	async getAllUsers() {
 		return await this.userService.getAllUsers()
-	}
-
-	@Get('/my-friends')
-	@UseGuards(JwtAuthGuard)
-	async getMyFriends(@Request() req) {
-		return await this.userService.getMyFriends(req.user.id)
 	}
 
 	@Get(':id')
