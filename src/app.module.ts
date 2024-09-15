@@ -10,9 +10,6 @@ import { UploadModule } from './upload/upload.module'
 import { ChatGateway } from './chat/chat.gateway'
 import { ChatEntity } from './chat/entities/chat.entity'
 import { MessageEntity } from './chat/entities/message.entity'
-import { ServeStaticModule } from '@nestjs/serve-static'
-import { FilesModule } from './files/files.module';
-import * as path from 'path'
 
 @Module({
 	imports: [
@@ -20,9 +17,6 @@ import * as path from 'path'
 		AuthModule,
 		ChatModule,
 		UploadModule,
-		ServeStaticModule.forRoot({
-			rootPath: path.resolve(__dirname, 'static')
-		}),
 		ConfigModule.forRoot({
 			envFilePath: `.env.${process.env.NODE_ENV}`
 		}),
@@ -36,8 +30,7 @@ import * as path from 'path'
 			entities: [MessageEntity, ChatEntity, UserEntity],
 			synchronize: true
 		}),
-		TypeOrmModule.forFeature([MessageEntity, ChatEntity, UserEntity]),
-		FilesModule
+		TypeOrmModule.forFeature([MessageEntity, ChatEntity, UserEntity])
 	],
 	controllers: [],
 	providers: [ChatGateway, ChatService]

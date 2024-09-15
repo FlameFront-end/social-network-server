@@ -10,6 +10,8 @@ import { UserService } from '../user/user.service'
 import { v4 as uuidv4 } from 'uuid'
 import * as fs from 'fs'
 import * as path from 'path'
+import { Req } from '@nestjs/common'
+import { Request } from 'express'
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway {
@@ -65,7 +67,8 @@ export class ChatGateway {
 			senderId: number
 			receiverId: number
 			content: string | null
-		}
+		},
+		@Req() req: Request
 	) {
 		const chatId = await this.chatService.getChatId(
 			message.senderId,
@@ -83,7 +86,7 @@ export class ChatGateway {
 
 		await fs.promises.writeFile(filePath, buffer)
 
-		const audioUrl = `http://localhost:3000/uploads/voice/${fileName}`
+		const audioUrl = `${req.protocol}://voice/${req.get('host')}/${fileName}`
 
 		const savedMessage = await this.chatService.saveMessage({
 			senderId: message.senderId,
@@ -93,7 +96,7 @@ export class ChatGateway {
 			audioUrl
 		})
 
-		await this.chatService.updateLastMessage(chatId, 'Voice message')
+		await this.chatService.updateLastMessage(chatId, 'Голосовое сообщение')
 
 		const sender = await this.userService.findBuId(message.senderId)
 		const receiver = await this.userService.findBuId(message.receiverId)
