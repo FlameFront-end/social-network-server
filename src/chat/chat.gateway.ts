@@ -29,6 +29,7 @@ export class ChatGateway {
 			senderId: number
 			receiverId: number
 			content: string
+			replyToMessageId?: number
 		}
 	) {
 		const chatId = await this.chatService.getChatId(
@@ -50,13 +51,33 @@ export class ChatGateway {
 		const sender = await this.userService.findBuId(message.senderId)
 		const receiver = await this.userService.findBuId(message.receiverId)
 
+		let replyToMessage = null
+		if (message.replyToMessageId) {
+			replyToMessage = await this.chatService.getMessageById(
+				message.replyToMessageId
+			)
+		}
+
 		const messageWithUsers = {
 			...savedMessage,
 			sender,
-			receiver
+			receiver,
+			replyToMessage
 		}
 
 		this.server.emit('receiveMessage', messageWithUsers)
+
+		const senderChats = await this.chatService.getAllChatsForUser(
+			message.senderId
+		)
+		const receiverChats = await this.chatService.getAllChatsForUser(
+			message.receiverId
+		)
+
+		this.server.to(`user_${message.senderId}`).emit('updateChats', senderChats)
+		this.server
+			.to(`user_${message.receiverId}`)
+			.emit('updateChats', receiverChats)
 	}
 
 	@SubscribeMessage('voice-message')
@@ -109,5 +130,22 @@ export class ChatGateway {
 		}
 
 		this.server.emit('receiveMessage', messageWithUsers)
+
+		const senderChats = await this.chatService.getAllChatsForUser(
+			message.senderId
+		)
+		const receiverChats = await this.chatService.getAllChatsForUser(
+			message.receiverId
+		)
+
+		this.server.to(`user_${message.senderId}`).emit('updateChats', senderChats)
+		this.server
+			.to(`user_${message.receiverId}`)
+			.emit('updateChats', receiverChats)
+	}
+
+	@SubscribeMessage('join')
+	handleJoinRoom(client: any, userId: number) {
+		client.join(`user_${userId}`)
 	}
 }

@@ -3,7 +3,8 @@ import {
 	PrimaryGeneratedColumn,
 	Column,
 	CreateDateColumn,
-	ManyToOne
+	ManyToOne,
+	JoinColumn
 } from 'typeorm'
 import { UserEntity } from '../../user/entities/user.entity'
 import { ChatEntity } from './chat.entity'
@@ -28,6 +29,9 @@ export class MessageEntity {
 	@Column()
 	chatId: number
 
+	@Column({ nullable: true })
+	replyToMessageId: number
+
 	@CreateDateColumn()
 	createdAt: Date
 
@@ -39,4 +43,8 @@ export class MessageEntity {
 
 	@ManyToOne(() => ChatEntity, chat => chat.messages)
 	chat: ChatEntity
+
+	@ManyToOne(() => MessageEntity)
+	@JoinColumn({ name: 'replyToMessageId' })
+	replyToMessage: MessageEntity
 }

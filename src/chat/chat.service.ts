@@ -24,13 +24,32 @@ export class ChatService {
 		return await this.messageRepository.save(messageEntity)
 	}
 
+	async getMessageById(messageId: number): Promise<MessageEntity> {
+		return this.messageRepository.findOne({
+			where: { id: messageId },
+			relations: [
+				'sender',
+				'receiver',
+				'replyToMessage',
+				'replyToMessage.sender',
+				'replyToMessage.receiver'
+			]
+		})
+	}
+
 	async getMessagesBetweenUsers(userId1: number, userId2: number) {
 		return await this.messageRepository.find({
 			where: [
 				{ senderId: userId1, receiverId: userId2 },
 				{ senderId: userId2, receiverId: userId1 }
 			],
-			relations: ['sender', 'receiver'],
+			relations: [
+				'sender',
+				'receiver',
+				'replyToMessage',
+				'replyToMessage.sender',
+				'replyToMessage.receiver'
+			],
 			order: { createdAt: 'ASC' }
 		})
 	}
