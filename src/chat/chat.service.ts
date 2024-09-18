@@ -16,8 +16,8 @@ export class ChatService {
 	async saveMessage(messageData: {
 		senderId: number
 		receiverId: number
-		content: string
 		chatId: number
+		content?: string
 		audioUrl?: string
 	}) {
 		const messageEntity = this.messageRepository.create(messageData)
@@ -73,8 +73,6 @@ export class ChatService {
 			user2Id: receiverId
 		})
 
-		console.log('newChat', newChat)
-
 		return await this.chatRepository.save(newChat)
 	}
 
@@ -92,7 +90,14 @@ export class ChatService {
 				'user1',
 				'user2'
 			],
-			order: { updateAt: 'ASC' }
+			order: { updateAt: 'DESC' }
 		})
+	}
+
+	async markMessagesAsRead(receiverId: number, chatId: number) {
+		await this.messageRepository.update(
+			{ receiverId, chatId, isRead: false },
+			{ isRead: true }
+		)
 	}
 }

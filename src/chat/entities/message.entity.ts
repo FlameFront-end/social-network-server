@@ -4,7 +4,8 @@ import {
 	Column,
 	CreateDateColumn,
 	ManyToOne,
-	JoinColumn
+	JoinColumn,
+	UpdateDateColumn
 } from 'typeorm'
 import { UserEntity } from '../../user/entities/user.entity'
 import { ChatEntity } from './chat.entity'
@@ -32,8 +33,14 @@ export class MessageEntity {
 	@Column({ nullable: true })
 	replyToMessageId: number
 
+	@Column({ default: false })
+	isRead: boolean
+
 	@CreateDateColumn()
 	createdAt: Date
+
+	@UpdateDateColumn()
+	updatedAt: Date
 
 	@ManyToOne(() => UserEntity, user => user.sentMessages)
 	sender: UserEntity
