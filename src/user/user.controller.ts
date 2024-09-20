@@ -15,6 +15,7 @@ import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import * as argon2 from 'argon2'
 import { ResetPasswordDto } from './dto/reset-password.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
 
 @Controller('user')
 @ApiTags('user')
@@ -53,6 +54,12 @@ export class UserController {
 	})
 	create(@Body() createUserDto: CreateUserDto) {
 		return this.userService.create(createUserDto)
+	}
+
+	@Patch('/update')
+	@UseGuards(JwtAuthGuard)
+	async updateUser(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+		return this.userService.update(req.user.id, updateUserDto)
 	}
 
 	@Patch('/reset-password')

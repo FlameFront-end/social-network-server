@@ -6,6 +6,7 @@ import { Repository } from 'typeorm'
 import * as argon2 from 'argon2'
 import { JwtService } from '@nestjs/jwt'
 import { IUser } from '../types/types'
+import { UpdateUserDto } from './dto/update-user.dto'
 
 @Injectable()
 export class UserService {
@@ -38,6 +39,12 @@ export class UserService {
 			...user,
 			token
 		}
+	}
+
+	async update(id: number, updateUserDto: UpdateUserDto) {
+		const user = await this.findBuId(id)
+		Object.assign(user, updateUserDto)
+		return this.userRepository.save(user)
 	}
 
 	async findOne(email: string) {

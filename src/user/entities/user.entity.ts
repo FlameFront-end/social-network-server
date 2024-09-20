@@ -38,11 +38,26 @@ export class UserEntity {
 	@Column({ default: false })
 	isAdmin: boolean
 
-	@CreateDateColumn()
-	createdAt: Date
+	@Column({ nullable: true })
+	shortInfo: string
 
-	@UpdateDateColumn()
-	updatedAt: Date
+	@Column({ nullable: true })
+	city: string
+
+	@Column({ type: 'json', default: [] })
+	grandparents: string[]
+
+	@Column({ type: 'json', default: [] })
+	parents: string[]
+
+	@Column({ type: 'json', default: [] })
+	siblings: string[]
+
+	@Column({ type: 'json', default: [] })
+	children: string[]
+
+	@Column({ type: 'json', default: [] })
+	grandsons: string[]
 
 	@ManyToMany(() => MessageEntity, message => message.sender)
 	sentMessages: MessageEntity[]
@@ -64,4 +79,10 @@ export class UserEntity {
 
 	@Column({ type: 'json', default: [] })
 	friends: number[]
+
+	@CreateDateColumn()
+	createdAt: Date
+
+	@UpdateDateColumn()
+	updatedAt: Date
 }
