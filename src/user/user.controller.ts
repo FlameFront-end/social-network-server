@@ -23,40 +23,13 @@ export class UserController {
 	constructor(private readonly userService: UserService) {}
 
 	@Post('/register')
-	@ApiBody({
-		schema: {
-			type: 'object',
-			properties: {
-				ava: {
-					type: 'string'
-				},
-				surname: {
-					type: 'string'
-				},
-				name: {
-					type: 'string'
-				},
-				patronymic: {
-					type: 'string'
-				},
-				email: {
-					type: 'string'
-				},
-				birthdate: {
-					type: 'string',
-					default: '24.09.2004'
-				},
-				password: {
-					type: 'string'
-				}
-			}
-		}
-	})
+	@ApiBody({ type: CreateUserDto })
 	create(@Body() createUserDto: CreateUserDto) {
 		return this.userService.create(createUserDto)
 	}
 
 	@Patch('/update')
+	@ApiBody({ type: UpdateUserDto })
 	@UseGuards(JwtAuthGuard)
 	async updateUser(@Request() req, @Body() updateUserDto: UpdateUserDto) {
 		return this.userService.update(req.user.id, updateUserDto)

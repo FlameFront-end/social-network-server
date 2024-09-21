@@ -10,7 +10,8 @@ import { UploadModule } from './upload/upload.module'
 import { ChatGateway } from './chat/chat.gateway'
 import { ChatEntity } from './chat/entities/chat.entity'
 import { MessageEntity } from './chat/entities/message.entity'
-import { FriendsModule } from './friends/friends.module';
+import { FriendsModule } from './friends/friends.module'
+import { MailModule } from './mail/mail.module'
 
 @Module({
 	imports: [
@@ -18,6 +19,8 @@ import { FriendsModule } from './friends/friends.module';
 		AuthModule,
 		ChatModule,
 		UploadModule,
+		MailModule,
+		FriendsModule,
 		ConfigModule.forRoot({
 			envFilePath: `.env.${process.env.NODE_ENV}`
 		}),
@@ -31,8 +34,7 @@ import { FriendsModule } from './friends/friends.module';
 			entities: [MessageEntity, ChatEntity, UserEntity],
 			synchronize: true
 		}),
-		TypeOrmModule.forFeature([MessageEntity, ChatEntity, UserEntity]),
-		FriendsModule
+		TypeOrmModule.forFeature([MessageEntity, ChatEntity, UserEntity])
 	],
 	controllers: [],
 	providers: [ChatGateway, ChatService]
