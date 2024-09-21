@@ -13,7 +13,6 @@ export class AuthService {
 
 	async validateUser(email: string, password: string) {
 		const user = await this.userService.findOne(email)
-		console.log('validateUser user', user)
 		const passwordIsMatch = await argon2.verify(user.password, password)
 
 		if (user && passwordIsMatch) {
@@ -39,5 +38,23 @@ export class AuthService {
 
 	async getUserByEmail(email: string) {
 		return await this.userService.findOne(email)
+	}
+
+	async validateToken(token: string) {
+		try {
+			const decoded = this.jwtService.verify(token)
+			const user = await this.userService.findBuId(decoded.id)
+			return {
+				token: token,
+				ava: user.ava,
+				email: user.email,
+				id: user.id,
+				name: user.name,
+				patronymic: user.patronymic,
+				surname: user.surname
+			}
+		} catch (error) {
+			throw new UnauthorizedException('Неверный токен!')
+		}
 	}
 }
