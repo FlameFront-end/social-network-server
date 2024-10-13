@@ -7,30 +7,17 @@ import {
 } from '@nestjs/common'
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
-import * as axios from 'axios'
-import * as process from 'node:process'
-import { v4 as uuidv4 } from 'uuid' // Import UUID
+import * as Bytescale from '@bytescale/sdk'
+import nodeFetch from 'node-fetch'
+import { v4 as uuidv4 } from 'uuid'
 
 @ApiTags('upload')
 @Controller('upload')
 export class UploadController {
-	private readonly YANDEX_API_BASE_URL =
-		'https://cloud-api.yandex.net/v1/disk/resources'
-	private readonly OAUTH_TOKEN = process.env.OAUTH_TOKEN
-
-	private getAuthHeaders() {
-		return {
-			Authorization: `OAuth ${this.OAUTH_TOKEN}`
-		}
-	}
-
-	private async getYandexDiskUrl(endpoint: string, path: string) {
-		const response = await axios.default.get(
-			`${this.YANDEX_API_BASE_URL}/${endpoint}?path=${encodeURIComponent(path)}`,
-			{ headers: this.getAuthHeaders() }
-		)
-		return response.data.href
-	}
+	private readonly uploadManager = new Bytescale.UploadManager({
+		fetchApi: nodeFetch as any,
+		apiKey: process.env.BYTESCALE_API_KEY
+	})
 
 	@Post('image')
 	@UseInterceptors(
@@ -61,22 +48,16 @@ export class UploadController {
 			throw new BadRequestException('File upload failed')
 		}
 
-		const filePath = `${uuidv4()}_${image.originalname}`
+		try {
+			const { fileUrl } = await this.uploadManager.upload({
+				data: image.buffer,
+				mime: image.mimetype,
+				originalFileName: `${uuidv4()}_${image.originalname}`
+			})
 
-		const uploadUrl = await this.getYandexDiskUrl('upload', filePath)
-
-		await axios.default.put(uploadUrl, image.buffer, {
-			headers: { 'Content-Type': 'application/octet-stream' }
-		})
-
-		await axios.default.put(
-			`${this.YANDEX_API_BASE_URL}/publish?path=${encodeURIComponent(filePath)}`,
-			null,
-			{ headers: this.getAuthHeaders() }
-		)
-
-		const fileUrl = await this.getYandexDiskUrl('download', filePath)
-
-		return { url: fileUrl }
+			return { url: fileUrl }
+		} catch (error) {
+			throw new BadRequestException(`File upload failed: ${error.message}`)
+		}
 	}
 }

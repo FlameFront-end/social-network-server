@@ -326,6 +326,11 @@
   resolved "https://registry.npmmirror.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@bytescale/sdk@^3.47.0":
+  version "3.47.0"
+  resolved "https://registry.npmmirror.com/@bytescale/sdk/-/sdk-3.47.0.tgz#d89667abd61d0e6316c8a14cc74f55d87bbecb7d"
+  integrity sha512-Ig0jXDebS89J70/6s/YBq1CmksFwaWyXpnJScDeABxftOIzlUeDa/w9tnoUwEnft5xfOm94gwURwt8/MBFygSw==
+
 "@colors/colors@1.5.0":
   version "1.5.0"
   resolved "https://registry.npmmirror.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
@@ -1097,6 +1102,14 @@
   integrity sha512-pQ2hoqvXiJt2FP9WQVLPRO+AmiIm/ZYkavPlIQnx282u4ZrVdztx0pkh3jjpQt0Kz+YI0YhSG264y08UJKoUQg==
   dependencies:
     "@types/express" "*"
+
+"@types/node-fetch@^2.6.11":
+  version "2.6.11"
+  resolved "https://registry.npmmirror.com/@types/node-fetch/-/node-fetch-2.6.11.tgz#9b39b78665dae0e82a08f02f4967d62c66f95d24"
+  integrity sha512-24xFj9R5+rfQJLRyM56qh+wnVSYhyXC2tkoBndtY0U+vubqNsYXGjufB2nn8Q6gt0LrARwL6UBtMCSVCwl4B1g==
+  dependencies:
+    "@types/node" "*"
+    form-data "^4.0.0"
 
 "@types/node@*", "@types/node@>=10.0.0":
   version "22.5.4"
