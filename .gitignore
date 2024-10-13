@@ -1,5 +1,7 @@
 .idea
 node_modules
-.env.development
 dist
 uploads
+
+.env.production
+.env.development

@@ -101,30 +101,13 @@ export class ChatGateway {
 			.emit('updateChats', receiverChats)
 	}
 
-	@SubscribeMessage('join')
-	handleJoinRoom(client: any, userId: number) {
-		client.join(`user_${userId}`)
-	}
-
-	@SubscribeMessage('markAsRead')
-	async handleMarkAsRead(
-		@MessageBody()
-		data: {
-			receiverId: number
-			senderId: number
-			chatId: number
-		}
+	@SubscribeMessage('messageRead')
+	async handleMessageRead(
+		@MessageBody() { messageId, userId }: { messageId: number; userId: number }
 	) {
-		await this.chatService.markMessagesAsRead(data.receiverId, data.chatId)
+		await this.chatService.markMessagesAsRead(messageId, userId)
 
-		this.server
-			.to(`user_${data.receiverId}`)
-			.emit('messagesRead', { chatId: data.chatId })
-		this.server
-			.to(`user_${data.senderId}`)
-			.emit('messagesRead', { chatId: data.chatId })
-		this.server
-			.to(`chat_${data.chatId}`)
-			.emit('messagesRead', { chatId: data.chatId })
+		const updatedMessage = await this.chatService.getMessageById(messageId)
+		this.server.emit('messageReadUpdate', updatedMessage)
 	}
 }
