@@ -12,7 +12,7 @@ export class AuthService {
 	) {}
 
 	async validateUser(email: string, password: string) {
-		const user = await this.userService.findOne(email)
+		const user = await this.userService.findOneByEmail(email)
 		const passwordIsMatch = await argon2.verify(user.password, password)
 
 		if (user && passwordIsMatch) {
@@ -36,14 +36,14 @@ export class AuthService {
 		}
 	}
 
-	async getUserByEmail(email: string) {
-		return await this.userService.findOne(email)
+	async getUserByEmail(email: string, details?: boolean) {
+		return await this.userService.findOneByEmail(email, details)
 	}
 
 	async validateToken(token: string) {
 		try {
 			const decoded = this.jwtService.verify(token)
-			const user = await this.userService.findBuId(decoded.id)
+			const user = await this.userService.findOneById(decoded.id)
 			return {
 				token: token,
 				ava: user.ava,

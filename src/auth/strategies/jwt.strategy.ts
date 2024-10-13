@@ -19,6 +19,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 	}
 
 	async validate(user: IUser) {
-		return await this.userService.findOne(user.email)
+		return await this.userService.findOneByEmail(user.email)
 	}
 }

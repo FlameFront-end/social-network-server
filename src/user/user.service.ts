@@ -71,31 +71,38 @@ export class UserService {
 		return user
 	}
 
-	async findOne(email: string) {
-		return await this.userRepository.findOne({
-			where: { email: email }
-		})
+	async findOneByEmail(email: string, details?: boolean) {
+		if (details) {
+			return await this.userRepository.findOne({
+				where: { email: email },
+				relations: ['details']
+			})
+		} else {
+			return await this.userRepository.findOne({
+				where: { email: email }
+			})
+		}
 	}
 
-	async findBuId(id: number) {
-		return await this.userRepository.findOne({
-			where: { id }
-		})
+	async findOneById(id: number, details?: boolean) {
+		console.log('details', details)
+
+		if (details) {
+			console.log('yes')
+			return await this.userRepository.findOne({
+				where: { id },
+				relations: ['details']
+			})
+		} else {
+			return await this.userRepository.findOne({
+				where: { id }
+			})
+		}
 	}
 
-	async findOneDetails(id: number) {
-		return await this.userRepository.findOne({
-			where: { id },
-			relations: ['details']
-		})
-	}
-
-	async getAllUsers() {
-		return await this.userRepository.find()
-	}
-
-	async getUserByEmail(email: string) {
-		return await this.findOne(email)
+	async getAllUsers(details?: boolean) {
+		const options = details ? { relations: ['details'] } : {}
+		return await this.userRepository.find(options)
 	}
 
 	async updatePassword(userId: number, newPassword: string): Promise<void> {

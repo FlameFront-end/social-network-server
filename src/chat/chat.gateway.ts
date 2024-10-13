@@ -68,8 +68,8 @@ export class ChatGateway {
 			: message.content
 		await this.chatService.updateLastMessage(chatId, lastMessageContent)
 
-		const sender = await this.userService.findBuId(message.senderId)
-		const receiver = await this.userService.findBuId(message.receiverId)
+		const sender = await this.userService.findOneById(message.senderId)
+		const receiver = await this.userService.findOneById(message.receiverId)
 
 		let replyToMessage = null
 		if (message.replyToMessageId) {

@@ -3,6 +3,7 @@ import {
 	Get,
 	Param,
 	Post,
+	Query,
 	Request,
 	UseGuards
 } from '@nestjs/common'
@@ -24,8 +25,8 @@ export class AuthController {
 
 	@Get('profile')
 	@UseGuards(JwtAuthGuard)
-	getProfile(@Request() req) {
-		return this.authService.getUserByEmail(req.user.email)
+	getProfile(@Request() req, @Query('details') details?: string) {
+		return this.authService.getUserByEmail(req.user.email, details === 'true')
 	}
 
 	@Get('validate-token/:token')

@@ -5,6 +5,7 @@ import {
 	Param,
 	Patch,
 	Post,
+	Query,
 	Request,
 	UnauthorizedException,
 	UseGuards
@@ -39,7 +40,7 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	async resetPassword(@Request() req, @Body() body: ResetPasswordDto) {
 		const { old_password, new_password } = body
-		const user = await this.userService.getUserByEmail(req.user.email)
+		const user = await this.userService.findOneByEmail(req.user.email)
 
 		const isOldPasswordValid = await argon2.verify(user.password, old_password)
 
@@ -52,16 +53,15 @@ export class UserController {
 	}
 
 	@Get('/all')
-	async getAllUsers() {
-		return await this.userService.getAllUsers()
-	}
-	@Get('/details/:id')
-	async findOneDetails(@Param('id') id: string) {
-		return this.userService.findOneDetails(+id)
+	async getAllUsers(@Query('details') details?: string) {
+		return await this.userService.getAllUsers(details === 'true')
 	}
 
 	@Get(':id')
-	async findOne(@Param('id') id: string) {
-		return this.userService.findBuId(+id)
+	async findOneById(
+		@Param('id') id: string,
+		@Query('details') details?: string
+	) {
+		return this.userService.findOneById(+id, details === 'true')
 	}
 }
