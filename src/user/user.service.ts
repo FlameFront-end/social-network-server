@@ -7,6 +7,7 @@ import * as argon2 from 'argon2'
 import { JwtService } from '@nestjs/jwt'
 import { IUser } from '../types/types'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { UserDetailsEntity } from './entities/user-details.entity'
 
 @Injectable()
 export class UserService {
@@ -27,10 +28,16 @@ export class UserService {
 			throw new BadRequestException('Эта почта уже занята')
 		}
 
+		const userDetails = new UserDetailsEntity()
+		if (createUserDto.details) {
+			Object.assign(userDetails, createUserDto.details)
+		}
+
 		const user = await this.userRepository.save({
 			...createUserDto,
 			password: await argon2.hash(createUserDto.password),
-			isAdmin: createUserDto.email === '5017_30@mail.ru'
+			isAdmin: createUserDto.email === '5017_30@mail.ru',
+			details: userDetails
 		})
 
 		const token = this.jwtService.sign({ email: createUserDto.email })
@@ -42,9 +49,26 @@ export class UserService {
 	}
 
 	async update(id: number, updateUserDto: UpdateUserDto) {
-		const user = await this.findBuId(id)
-		Object.assign(user, updateUserDto)
-		return this.userRepository.save(user)
+		const user = await this.userRepository.findOne({
+			where: { id },
+			relations: ['details']
+		})
+
+		if (!user) {
+			throw new Error('User not found')
+		}
+
+		const { details, ...userUpdateData } = updateUserDto
+
+		Object.assign(user, userUpdateData)
+
+		if (details) {
+			Object.assign(user.details, details)
+			await this.userRepository.manager.save(user.details)
+		}
+
+		await this.userRepository.save(user)
+		return user
 	}
 
 	async findOne(email: string) {
@@ -56,6 +80,13 @@ export class UserService {
 	async findBuId(id: number) {
 		return await this.userRepository.findOne({
 			where: { id }
+		})
+	}
+
+	async findOneDetails(id: number) {
+		return await this.userRepository.findOne({
+			where: { id },
+			relations: ['details']
 		})
 	}
 

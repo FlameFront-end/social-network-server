@@ -12,6 +12,7 @@ import { ChatEntity } from './chat/entities/chat.entity'
 import { MessageEntity } from './chat/entities/message.entity'
 import { FriendsModule } from './friends/friends.module'
 import { MailModule } from './mail/mail.module'
+import { UserDetailsEntity } from './user/entities/user-details.entity'
 
 @Module({
 	imports: [
@@ -31,10 +32,15 @@ import { MailModule } from './mail/mail.module'
 			username: process.env.POSTGRES_USER,
 			password: process.env.POSTGRESS_PASSWORD,
 			database: process.env.POSTGRES_DB,
-			entities: [MessageEntity, ChatEntity, UserEntity],
+			entities: [MessageEntity, ChatEntity, UserEntity, UserDetailsEntity],
 			synchronize: true
 		}),
-		TypeOrmModule.forFeature([MessageEntity, ChatEntity, UserEntity])
+		TypeOrmModule.forFeature([
+			MessageEntity,
+			ChatEntity,
+			UserEntity,
+			UserDetailsEntity
+		])
 	],
 	controllers: [],
 	providers: [ChatGateway, ChatService]

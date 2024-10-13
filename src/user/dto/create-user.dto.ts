@@ -1,30 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 
-export class CreateUserDto {
-	@ApiProperty({ example: 'user@example.com' })
-	readonly email: string
-
-	@ApiProperty({ example: 'password123' })
-	readonly password: string
-
-	@ApiProperty({ example: 'Ivanov' })
-	readonly surname: string
-
-	@ApiProperty({ example: 'Ivan' })
-	readonly name: string
-
-	@ApiProperty({ example: 'Ivanovich', required: false })
-	readonly patronymic?: string
-
-	@ApiProperty({ example: '1990-01-01', required: false })
-	readonly birthdate?: string
-
-	@ApiProperty({ example: 'https://example.com/avatar.jpg', required: false })
-	readonly ava?: string
-
-	@ApiProperty({ example: false })
-	readonly isAdmin?: boolean
-
+class UserDetailsDto {
 	@ApiProperty({ example: 'Brief info about the user', required: false })
 	readonly shortInfo?: string
 
@@ -86,4 +62,33 @@ export class CreateUserDto {
 
 	@ApiProperty({ type: [String], example: ['Alex', 'Nina'], required: false })
 	readonly grandsons?: string[]
+}
+
+export class CreateUserDto {
+	@ApiProperty({ example: 'user@example.com' })
+	readonly email: string
+
+	@ApiProperty({ example: 'password123' })
+	readonly password: string
+
+	@ApiProperty({ example: 'Ivanov' })
+	readonly surname: string
+
+	@ApiProperty({ example: 'Ivan' })
+	readonly name: string
+
+	@ApiProperty({ example: 'Ivanovich', required: false })
+	readonly patronymic?: string
+
+	@ApiProperty({ example: '1990-01-01', required: false })
+	readonly birthdate?: string
+
+	@ApiProperty({ example: 'https://example.com/avatar.jpg', required: false })
+	readonly ava?: string
+
+	@ApiProperty({ example: false })
+	readonly isAdmin?: boolean
+
+	@ApiProperty({ type: UserDetailsDto, required: false })
+	readonly details?: UserDetailsDto // добавляем объект details
 }

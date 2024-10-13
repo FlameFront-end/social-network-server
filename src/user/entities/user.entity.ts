@@ -4,10 +4,13 @@ import {
 	Column,
 	CreateDateColumn,
 	UpdateDateColumn,
+	OneToOne,
+	JoinColumn,
 	ManyToMany
 } from 'typeorm'
 import { MessageEntity } from '../../chat/entities/message.entity'
 import { ChatEntity } from '../../chat/entities/chat.entity'
+import { UserDetailsEntity } from './user-details.entity' // импортируем новую сущность
 
 @Entity('user')
 export class UserEntity {
@@ -38,59 +41,9 @@ export class UserEntity {
 	@Column({ default: false })
 	isAdmin: boolean
 
-	@Column({ nullable: true })
-	shortInfo: string
-
-	@Column({ nullable: true })
-	city: string
-
-	@Column({ nullable: true })
-	mobilePhone: string
-
-	@Column({ nullable: true })
-	additionalPhone: string
-
-	@Column({ nullable: true })
-	skype: string
-
-	@Column({ nullable: true })
-	site: string
-
-	@Column({ nullable: true })
-	activity: string
-
-	@Column({ nullable: true })
-	interests: string
-
-	@Column({ nullable: true })
-	music: string
-
-	@Column({ nullable: true })
-	movies: string
-
-	@Column({ nullable: true })
-	TVShows: string
-
-	@Column({ nullable: true })
-	games: string
-
-	@Column({ nullable: true })
-	quotes: string
-
-	@Column({ type: 'json', default: [] })
-	grandparents: string[]
-
-	@Column({ type: 'json', default: [] })
-	parents: string[]
-
-	@Column({ type: 'json', default: [] })
-	siblings: string[]
-
-	@Column({ type: 'json', default: [] })
-	children: string[]
-
-	@Column({ type: 'json', default: [] })
-	grandsons: string[]
+	@OneToOne(() => UserDetailsEntity, { cascade: true, eager: false })
+	@JoinColumn()
+	details: UserDetailsEntity
 
 	@ManyToMany(() => MessageEntity, message => message.sender)
 	sentMessages: MessageEntity[]
