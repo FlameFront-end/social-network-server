@@ -28,7 +28,10 @@ export class OnlineStatusGateway
 			return
 		}
 		await this.userService.updateOnlineStatus(userId, true)
-		this.server.emit('user-status', { userId, online: true })
+
+		const data = await this.userService.getUserStatus(userId)
+
+		this.server.emit('user-status', { userId, data })
 	}
 
 	async handleDisconnect(client: Socket) {
@@ -36,7 +39,10 @@ export class OnlineStatusGateway
 		if (userId) {
 			await this.userService.updateOnlineStatus(userId, false)
 			await this.userService.updateLastSeen(userId)
-			this.server.emit('user-status', { userId, online: false })
+
+			const data = await this.userService.getUserStatus(userId)
+
+			this.server.emit('user-status', { userId, data })
 		}
 	}
 
