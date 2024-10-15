@@ -10,7 +10,7 @@ import {
 } from 'typeorm'
 import { MessageEntity } from '../../chat/entities/message.entity'
 import { ChatEntity } from '../../chat/entities/chat.entity'
-import { UserDetailsEntity } from './user-details.entity' // импортируем новую сущность
+import { UserDetailsEntity } from './user-details.entity'
 
 @Entity('user')
 export class UserEntity {
@@ -40,6 +40,12 @@ export class UserEntity {
 
 	@Column({ default: false })
 	isAdmin: boolean
+
+	@Column({ default: false })
+	isOnline: boolean
+
+	@Column({ nullable: true })
+	lastSeen: Date
 
 	@OneToOne(() => UserDetailsEntity, { cascade: true, eager: false })
 	@JoinColumn()

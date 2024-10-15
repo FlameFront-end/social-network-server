@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { AuthModule } from './auth/auth.module'
 import { UserEntity } from './user/entities/user.entity'
 import { UserModule } from './user/user.module'
-import { ConfigModule } from '@nestjs/config'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import { ChatModule } from './chat/chat.module'
 import { ChatService } from './chat/chat.service'
 import { UploadModule } from './upload/upload.module'
@@ -13,6 +13,9 @@ import { MessageEntity } from './chat/entities/message.entity'
 import { FriendsModule } from './friends/friends.module'
 import { MailModule } from './mail/mail.module'
 import { UserDetailsEntity } from './user/entities/user-details.entity'
+import { OnlineStatusGateway } from './online-status/online-status.gateway'
+import { OnlineStatusModule } from './online-status/online-status.module'
+import { JwtModule } from '@nestjs/jwt'
 
 @Module({
 	imports: [
@@ -22,6 +25,7 @@ import { UserDetailsEntity } from './user/entities/user-details.entity'
 		UploadModule,
 		MailModule,
 		FriendsModule,
+		OnlineStatusModule,
 		ConfigModule.forRoot({
 			envFilePath: `.env.${process.env.NODE_ENV}`
 		}),
@@ -35,6 +39,14 @@ import { UserDetailsEntity } from './user/entities/user-details.entity'
 			entities: [MessageEntity, ChatEntity, UserEntity, UserDetailsEntity],
 			synchronize: true
 		}),
+		JwtModule.registerAsync({
+			imports: [ConfigModule],
+			useFactory: (configService: ConfigService) => ({
+				secret: configService.get('JWT_SECRET'),
+				signOptions: { expiresIn: '30d' }
+			}),
+			inject: [ConfigService]
+		}),
 		TypeOrmModule.forFeature([
 			MessageEntity,
 			ChatEntity,
@@ -43,6 +55,6 @@ import { UserDetailsEntity } from './user/entities/user-details.entity'
 		])
 	],
 	controllers: [],
-	providers: [ChatGateway, ChatService]
+	providers: [ChatGateway, ChatService, OnlineStatusGateway]
 })
 export class AppModule {}

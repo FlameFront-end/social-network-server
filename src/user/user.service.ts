@@ -85,10 +85,7 @@ export class UserService {
 	}
 
 	async findOneById(id: number, details?: boolean) {
-		console.log('details', details)
-
 		if (details) {
-			console.log('yes')
 			return await this.userRepository.findOne({
 				where: { id },
 				relations: ['details']
@@ -112,5 +109,20 @@ export class UserService {
 	async resetPassword(user: IUser, newPassword: string): Promise<void> {
 		const hashedNewPassword = await argon2.hash(newPassword)
 		await this.updatePassword(user.id, hashedNewPassword)
+	}
+
+	async updateOnlineStatus(userId: number, isOnline: boolean): Promise<void> {
+		await this.userRepository.update(userId, { isOnline })
+	}
+
+	async updateLastSeen(userId: number): Promise<void> {
+		await this.userRepository.update(userId, { lastSeen: new Date() })
+	}
+
+	async getUserStatus(
+		userId: number
+	): Promise<{ isOnline: boolean; lastSeen: Date }> {
+		const user = await this.userRepository.findOne({ where: { id: userId } })
+		return { isOnline: user.isOnline, lastSeen: user.lastSeen }
 	}
 }
