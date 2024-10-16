@@ -1,21 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { PostEntity } from './entities/post.entity'
-import { CommentEntity } from './entities/comment.entity'
+import { PostsEntity } from './entities/posts.entity'
+import { CommentsEntity } from './entities/comments.entity'
 import { CreatePostDto } from './dto/create-post.dto'
 import { CreateCommentDto } from './dto/create-comment.dto'
 import { UserEntity } from '../user/entities/user.entity'
 
 @Injectable()
-export class PostService {
+export class PostsService {
 	constructor(
-		@InjectRepository(PostEntity)
-		private readonly postRepository: Repository<PostEntity>,
+		@InjectRepository(PostsEntity)
+		private readonly postRepository: Repository<PostsEntity>,
 		@InjectRepository(UserEntity)
 		private readonly userRepository: Repository<UserEntity>,
-		@InjectRepository(CommentEntity)
-		private readonly commentRepository: Repository<CommentEntity>
+		@InjectRepository(CommentsEntity)
+		private readonly commentRepository: Repository<CommentsEntity>
 	) {}
 
 	async create(creatorId: number, createPostDto: CreatePostDto) {

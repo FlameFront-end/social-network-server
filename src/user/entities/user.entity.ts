@@ -12,7 +12,7 @@ import {
 import { MessageEntity } from '../../chat/entities/message.entity'
 import { ChatEntity } from '../../chat/entities/chat.entity'
 import { UserDetailsEntity } from './user-details.entity'
-import { PostEntity } from '../../post/entities/post.entity'
+import { PostsEntity } from '../../posts/entities/posts.entity'
 
 @Entity('user')
 export class UserEntity {
@@ -65,8 +65,8 @@ export class UserEntity {
 	@ManyToMany(() => ChatEntity, chat => chat.user2)
 	chatsAsUser2: ChatEntity[]
 
-	@OneToMany(() => PostEntity, post => post.creator)
-	posts: PostEntity[]
+	@OneToMany(() => PostsEntity, post => post.creator)
+	posts: PostsEntity[]
 
 	@Column({ type: 'json', default: [] })
 	outgoingFriendRequests: number[]

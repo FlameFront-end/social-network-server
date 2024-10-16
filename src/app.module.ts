@@ -16,9 +16,9 @@ import { UserDetailsEntity } from './user/entities/user-details.entity'
 import { OnlineStatusGateway } from './online-status/online-status.gateway'
 import { OnlineStatusModule } from './online-status/online-status.module'
 import { JwtModule } from '@nestjs/jwt'
-import { PostModule } from './post/post.module'
-import { CommentEntity } from './post/entities/comment.entity'
-import { PostEntity } from './post/entities/post.entity'
+import { PostsModule } from './posts/posts.module'
+import { CommentsEntity } from './posts/entities/comments.entity'
+import { PostsEntity } from './posts/entities/posts.entity'
 
 @Module({
 	imports: [
@@ -44,8 +44,8 @@ import { PostEntity } from './post/entities/post.entity'
 				ChatEntity,
 				UserEntity,
 				UserDetailsEntity,
-				CommentEntity,
-				PostEntity
+				CommentsEntity,
+				PostsEntity
 			],
 			synchronize: true
 		}),
@@ -62,10 +62,10 @@ import { PostEntity } from './post/entities/post.entity'
 			ChatEntity,
 			UserEntity,
 			UserDetailsEntity,
-			CommentEntity,
-			PostEntity
+			CommentsEntity,
+			PostsEntity
 		]),
-		PostModule
+		PostsModule
 	],
 	controllers: [],
 	providers: [ChatGateway, ChatService, OnlineStatusGateway]

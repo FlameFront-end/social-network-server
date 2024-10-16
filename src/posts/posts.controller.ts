@@ -8,17 +8,17 @@ import {
 	UseGuards,
 	Request
 } from '@nestjs/common'
-import { PostService } from './post.service'
+import { PostsService } from './posts.service'
 import { CreatePostDto } from './dto/create-post.dto'
 import { CreateCommentDto } from './dto/create-comment.dto'
 import { ApiBody, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
 import { UserRequest } from '../types/types'
 
-@Controller('post')
-@ApiTags('post')
-export class PostController {
-	constructor(private readonly postService: PostService) {}
+@Controller('posts')
+@ApiTags('posts')
+export class PostsController {
+	constructor(private readonly postService: PostsService) {}
 
 	@Post()
 	@ApiBody({ type: CreatePostDto })

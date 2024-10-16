@@ -9,10 +9,10 @@ import {
 	JoinTable
 } from 'typeorm'
 import { UserEntity } from '../../user/entities/user.entity'
-import { CommentEntity } from './comment.entity'
+import { CommentsEntity } from './comments.entity'
 
-@Entity('post')
-export class PostEntity {
+@Entity('posts')
+export class PostsEntity {
 	@PrimaryGeneratedColumn()
 	id: number
 
@@ -29,8 +29,8 @@ export class PostEntity {
 	@JoinTable()
 	likes: UserEntity[]
 
-	@OneToMany(() => CommentEntity, comment => comment.post, { cascade: true })
-	comments: CommentEntity[]
+	@OneToMany(() => CommentsEntity, comment => comment.post, { cascade: true })
+	comments: CommentsEntity[]
 
 	@CreateDateColumn()
 	createdAt: Date
