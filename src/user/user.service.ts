@@ -85,6 +85,8 @@ export class UserService {
 	}
 
 	async findOneById(id: number, details?: boolean) {
+		if (!id) return null
+
 		if (details) {
 			return await this.userRepository.findOne({
 				where: { id },

@@ -2,9 +2,10 @@ import {
 	WebSocketGateway,
 	SubscribeMessage,
 	MessageBody,
-	WebSocketServer
+	WebSocketServer,
+	ConnectedSocket
 } from '@nestjs/websockets'
-import { Server } from 'socket.io'
+import { Server, Socket } from 'socket.io'
 import { ChatService } from './chat.service'
 import { UserService } from '../user/user.service'
 import { v4 as uuidv4 } from 'uuid'
@@ -109,5 +110,31 @@ export class ChatGateway {
 
 		const updatedMessage = await this.chatService.getMessageById(messageId)
 		this.server.emit('messageReadUpdate', updatedMessage)
+	}
+
+	@SubscribeMessage('typing')
+	async handleTyping(
+		@MessageBody('senderId') senderId: number,
+		@ConnectedSocket() client: Socket
+	): Promise<void> {
+		const sender = await this.userService.findOneById(senderId)
+
+		client.broadcast.emit('typing', {
+			senderName: sender.name,
+			senderId: senderId
+		})
+	}
+
+	@SubscribeMessage('typingStopped')
+	async handleTypingStopped(
+		@MessageBody('senderId') senderId: number,
+		@ConnectedSocket() client: Socket
+	): Promise<void> {
+		const sender = await this.userService.findOneById(senderId)
+
+		client.broadcast.emit('typingStopped', {
+			senderName: sender.name,
+			senderId: senderId
+		})
 	}
 }
