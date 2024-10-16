@@ -6,9 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "prebuild": "node scripts/copy-uploads.js",
     "build": "nest build",
-    "postbuild": "node scripts/restore-uploads.js",
     "start:dev": "cross-env NODE_ENV=development nest start --watch",
     "start:prod": "cross-env NODE_ENV=production node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"

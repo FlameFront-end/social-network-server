@@ -16,6 +16,9 @@ import { UserDetailsEntity } from './user/entities/user-details.entity'
 import { OnlineStatusGateway } from './online-status/online-status.gateway'
 import { OnlineStatusModule } from './online-status/online-status.module'
 import { JwtModule } from '@nestjs/jwt'
+import { PostModule } from './post/post.module'
+import { CommentEntity } from './post/entities/comment.entity'
+import { PostEntity } from './post/entities/post.entity'
 
 @Module({
 	imports: [
@@ -36,7 +39,14 @@ import { JwtModule } from '@nestjs/jwt'
 			username: process.env.POSTGRES_USER,
 			password: process.env.POSTGRESS_PASSWORD,
 			database: process.env.POSTGRES_DB,
-			entities: [MessageEntity, ChatEntity, UserEntity, UserDetailsEntity],
+			entities: [
+				MessageEntity,
+				ChatEntity,
+				UserEntity,
+				UserDetailsEntity,
+				CommentEntity,
+				PostEntity
+			],
 			synchronize: true
 		}),
 		JwtModule.registerAsync({
@@ -51,8 +61,11 @@ import { JwtModule } from '@nestjs/jwt'
 			MessageEntity,
 			ChatEntity,
 			UserEntity,
-			UserDetailsEntity
-		])
+			UserDetailsEntity,
+			CommentEntity,
+			PostEntity
+		]),
+		PostModule
 	],
 	controllers: [],
 	providers: [ChatGateway, ChatService, OnlineStatusGateway]
