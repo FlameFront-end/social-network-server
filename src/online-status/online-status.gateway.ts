@@ -2,7 +2,9 @@ import {
 	WebSocketGateway,
 	WebSocketServer,
 	OnGatewayConnection,
-	OnGatewayDisconnect
+	OnGatewayDisconnect,
+	SubscribeMessage,
+	MessageBody
 } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
 import { Injectable } from '@nestjs/common'
@@ -31,7 +33,7 @@ export class OnlineStatusGateway
 
 		const data = await this.userService.getUserStatus(userId)
 
-		this.server.emit('user-status', { userId, data })
+		this.server.emit('my-status', { userId, data })
 	}
 
 	async handleDisconnect(client: Socket) {
@@ -42,8 +44,14 @@ export class OnlineStatusGateway
 
 			const data = await this.userService.getUserStatus(userId)
 
-			this.server.emit('user-status', { userId, data })
+			this.server.emit('my-status', { userId, data })
 		}
+	}
+
+	@SubscribeMessage('user-status')
+	async handleGetUserStatus(@MessageBody('userId') targetUserId: number) {
+		const data = await this.userService.getUserStatus(targetUserId)
+		this.server.emit('user-status-response', { userId: targetUserId, data })
 	}
 
 	private getUserIdFromSocket(client: Socket): number | null {
