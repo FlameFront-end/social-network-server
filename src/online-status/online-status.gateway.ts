@@ -4,6 +4,7 @@ import {
 	OnGatewayConnection,
 	OnGatewayDisconnect,
 	SubscribeMessage,
+	ConnectedSocket,
 	MessageBody
 } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
@@ -25,33 +26,37 @@ export class OnlineStatusGateway
 
 	async handleConnection(client: Socket) {
 		const userId = this.getUserIdFromSocket(client)
-		if (!userId) {
-			client.disconnect()
-			return
+
+		if (userId) {
+			await this.userService.updateOnlineStatus(userId, true)
+			const data = await this.userService.getUserStatus(userId)
+
+			client.emit('my-status', { userId, data })
+			client.broadcast.emit('user-status', { userId, data })
 		}
-		await this.userService.updateOnlineStatus(userId, true)
-
-		const data = await this.userService.getUserStatus(userId)
-
-		this.server.emit('my-status', { userId, data })
 	}
 
 	async handleDisconnect(client: Socket) {
 		const userId = this.getUserIdFromSocket(client)
+
 		if (userId) {
 			await this.userService.updateOnlineStatus(userId, false)
 			await this.userService.updateLastSeen(userId)
 
 			const data = await this.userService.getUserStatus(userId)
 
-			this.server.emit('my-status', { userId, data })
+			client.broadcast.emit('user-status', { userId, data })
 		}
 	}
 
 	@SubscribeMessage('user-status')
-	async handleGetUserStatus(@MessageBody('userId') targetUserId: number) {
+	async handleGetUserStatus(
+		@MessageBody('userId') targetUserId: number,
+		@ConnectedSocket() client: Socket
+	) {
 		const data = await this.userService.getUserStatus(targetUserId)
-		this.server.emit('user-status-response', { userId: targetUserId, data })
+
+		client.emit('user-status', { userId: targetUserId, data })
 	}
 
 	private getUserIdFromSocket(client: Socket): number | null {
@@ -59,7 +64,12 @@ export class OnlineStatusGateway
 		if (!token) {
 			return null
 		}
-		const decoded = this.jwtService.verify(token)
-		return decoded.id
+		try {
+			const decoded = this.jwtService.verify(token)
+			return decoded.id
+		} catch (err) {
+			console.error('JWT Verification failed:', err)
+			return null
+		}
 	}
 }
