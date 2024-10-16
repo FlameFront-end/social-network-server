@@ -19,7 +19,7 @@ export class FriendsController {
 	@Get('/my-friends')
 	@UseGuards(JwtAuthGuard)
 	async getMyFriends(@Request() req) {
-		return await this.friendsService.getMyFriends(req.user.id)
+		return await this.friendsService.getFriendsById(req.user.id)
 	}
 
 	@Get('/possible-friends')
@@ -82,5 +82,10 @@ export class FriendsController {
 	async removeFriend(@Request() req, @Param('friendId') friendId: string) {
 		await this.friendsService.removeFriend(req.user.id, +friendId)
 		return { message: 'Friend removed' }
+	}
+
+	@Get(':userId')
+	async getFriendsById(@Param('userId') userId: string) {
+		return await this.friendsService.getFriendsById(+userId)
 	}
 }

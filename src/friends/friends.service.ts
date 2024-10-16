@@ -41,7 +41,7 @@ export class FriendsService {
 		return await this.userRepository.findByIds(friendIds)
 	}
 
-	async getMyFriends(userId: number) {
+	async getFriendsById(userId: number) {
 		const user = await this.userRepository.findOne({
 			where: { id: userId }
 		})
