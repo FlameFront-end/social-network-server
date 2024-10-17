@@ -101,7 +101,8 @@ export class PostsService {
 	async findPostsByUser(userId: number) {
 		return this.postRepository.find({
 			where: { creator: { id: userId } },
-			relations: ['creator', 'comments', 'likes']
+			relations: ['creator', 'comments', 'likes'],
+			order: { createdAt: 'DESC' }
 		})
 	}
 
