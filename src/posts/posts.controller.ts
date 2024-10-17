@@ -48,10 +48,9 @@ export class PostsController {
 		return this.postService.findAll()
 	}
 
-	@Get('my')
-	@UseGuards(JwtAuthGuard)
-	findPostsByUser(@Request() req: UserRequest) {
-		return this.postService.findPostsByUser(+req.user.id)
+	@Get('all/:userId')
+	findPostsByUser(@Param('userId') userId: string) {
+		return this.postService.findPostsByUser(+userId)
 	}
 
 	@Get(':id')
