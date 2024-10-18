@@ -19,17 +19,10 @@ export class UploadController {
 		apiKey: process.env.BYTESCALE_API_KEY
 	})
 
-	@Post('image')
+	@Post()
 	@UseInterceptors(
-		FilesInterceptor('image', 10, {
-			// Позволяет загружать до 10 файлов
-			limits: { fileSize: 5 * 1024 * 1024 },
-			fileFilter: (_, file, cb) => {
-				if (!file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
-					return cb(new BadRequestException('Unsupported file type'), false)
-				}
-				cb(null, true)
-			}
+		FilesInterceptor('file', 10, {
+			limits: { fileSize: 5 * 1024 * 1024 }
 		})
 	)
 	@ApiConsumes('multipart/form-data')
@@ -37,25 +30,25 @@ export class UploadController {
 		schema: {
 			type: 'object',
 			properties: {
-				image: {
+				file: {
 					type: 'array',
 					items: { type: 'string', format: 'binary' }
 				}
 			}
 		}
 	})
-	async create(@UploadedFiles() images: Express.Multer.File[]) {
-		if (!images || images.length === 0) {
+	async upload(@UploadedFiles() files: Express.Multer.File[]) {
+		if (!files || files.length === 0) {
 			throw new BadRequestException('File upload failed')
 		}
 
 		const uploadedUrls = []
 		try {
-			for (const image of images) {
+			for (const file of files) {
 				const { fileUrl } = await this.uploadManager.upload({
-					data: image.buffer,
-					mime: image.mimetype,
-					originalFileName: `${uuidv4()}_${image.originalname}`
+					data: file.buffer,
+					mime: file.mimetype,
+					originalFileName: `${uuidv4()}_${file.originalname}`
 				})
 				uploadedUrls.push(fileUrl)
 			}
