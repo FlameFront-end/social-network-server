@@ -21,7 +21,7 @@ export class ChatGateway {
 		private readonly userService: UserService
 	) {}
 
-	@SubscribeMessage('sendMessage')
+	@SubscribeMessage('send-message')
 	async handleMessage(
 		@MessageBody()
 		message: {
@@ -84,11 +84,11 @@ export class ChatGateway {
 			chatId: message.chatId
 		}
 
-		this.server.emit('receiveMessage', messageWithUsers)
-		this.server.emit('updateChat', updateChat)
+		this.server.emit('receive-message', messageWithUsers)
+		this.server.emit('update-chat', updateChat)
 	}
 
-	@SubscribeMessage('messageRead')
+	@SubscribeMessage('message-read')
 	async handleMessageRead(
 		@MessageBody()
 		{ messageId }: { messageId: number }
@@ -100,7 +100,7 @@ export class ChatGateway {
 		await this.chatService.markMessagesAsRead(messageId)
 		const updatedMessage = await this.chatService.getMessageById(messageId)
 
-		this.server.emit('messageReadUpdate', updatedMessage)
+		this.server.emit('message-read', updatedMessage)
 	}
 	@SubscribeMessage('typing')
 	async handleTyping(
@@ -120,7 +120,7 @@ export class ChatGateway {
 		})
 	}
 
-	@SubscribeMessage('typingStopped')
+	@SubscribeMessage('typing-stopped')
 	async handleTypingStopped(
 		@MessageBody()
 		body: {
@@ -131,7 +131,7 @@ export class ChatGateway {
 	): Promise<void> {
 		const sender = await this.userService.findOneById(body.senderId)
 
-		client.broadcast.emit('typingStopped', {
+		client.broadcast.emit('typing-stopped', {
 			senderName: sender.name,
 			senderId: body.senderId,
 			chatId: body.chatId
