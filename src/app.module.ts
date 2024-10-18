@@ -47,7 +47,8 @@ import { PostsEntity } from './posts/entities/posts.entity'
 				CommentsEntity,
 				PostsEntity
 			],
-			synchronize: true
+			synchronize: true,
+			ssl: { rejectUnauthorized: false }
 		}),
 		JwtModule.registerAsync({
 			imports: [ConfigModule],
