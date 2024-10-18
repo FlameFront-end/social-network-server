@@ -11,6 +11,9 @@ import { UserService } from '../user/user.service'
 import { v4 as uuidv4 } from 'uuid'
 import * as fs from 'fs'
 import * as path from 'path'
+import { BadRequestException } from '@nestjs/common'
+import * as Bytescale from '@bytescale/sdk'
+import nodeFetch from 'node-fetch'
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway {
@@ -20,6 +23,11 @@ export class ChatGateway {
 		private readonly chatService: ChatService,
 		private readonly userService: UserService
 	) {}
+
+	private readonly uploadManager = new Bytescale.UploadManager({
+		fetchApi: nodeFetch as any,
+		apiKey: process.env.BYTESCALE_API_KEY
+	})
 
 	@SubscribeMessage('send-message')
 	async handleMessage(
@@ -35,21 +43,21 @@ export class ChatGateway {
 	) {
 		let audioUrl = null
 		if (message.audio) {
-			const dirPath = path.join(__dirname, '../..', 'uploads', 'voice')
-
-			if (!fs.existsSync(dirPath)) {
-				fs.mkdirSync(dirPath, { recursive: true })
-			}
-
 			const buffer = Buffer.from(message.audio)
 			const fileName = `${uuidv4()}.webm`
-			const filePath = path.join(dirPath, fileName)
 
-			await fs.promises.writeFile(filePath, buffer)
+			try {
+				const { fileUrl } = await this.uploadManager.upload({
+					data: buffer,
+					mime: 'audio/webm',
+					originalFileName: fileName
+				})
 
-			audioUrl = `http://localhost:3000/uploads/voice/${fileName}`
+				audioUrl = fileUrl
+			} catch (error) {
+				throw new BadRequestException(`Audio upload failed: ${error.message}`)
+			}
 		}
-
 		const savedMessage = await this.chatService.saveMessage({
 			...message,
 			chatId: message.chatId,
