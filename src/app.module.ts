@@ -48,7 +48,10 @@ import { PostsEntity } from './posts/entities/posts.entity'
 				PostsEntity
 			],
 			synchronize: true,
-			ssl: { rejectUnauthorized: false }
+			ssl:
+				process.env.NODE_ENV === 'development'
+					? false
+					: { rejectUnauthorized: true }
 		}),
 		JwtModule.registerAsync({
 			imports: [ConfigModule],
