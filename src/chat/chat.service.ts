@@ -78,6 +78,8 @@ export class ChatService {
 
 	async updateLastMessage(chatId: number, lastMessage: string) {
 		await this.chatRepository.update(chatId, { lastMessage })
+
+		return await this.chatRepository.findOne({ where: { id: chatId } })
 	}
 
 	async getAllChatsForUser(userId: number) {
@@ -94,10 +96,7 @@ export class ChatService {
 		})
 	}
 
-	async markMessagesAsRead(receiverId: number, chatId: number) {
-		await this.messageRepository.update(
-			{ receiverId, chatId, isRead: false },
-			{ isRead: true }
-		)
+	async markMessagesAsRead(messageId: number): Promise<void> {
+		await this.messageRepository.update(messageId, { isRead: true })
 	}
 }

@@ -25,6 +25,7 @@ export class ChatGateway {
 	async handleMessage(
 		@MessageBody()
 		message: {
+			chatId: number
 			senderId: number
 			receiverId: number
 			content?: string
@@ -32,15 +33,6 @@ export class ChatGateway {
 			replyToMessageId?: number
 		}
 	) {
-		const chatId = await this.chatService.getChatId(
-			message.senderId,
-			message.receiverId
-		)
-
-		if (!chatId) {
-			await this.chatService.createChat(message.senderId, message.receiverId)
-		}
-
 		let audioUrl = null
 		if (message.audio) {
 			const dirPath = path.join(__dirname, '../..', 'uploads', 'voice')
@@ -60,14 +52,18 @@ export class ChatGateway {
 
 		const savedMessage = await this.chatService.saveMessage({
 			...message,
-			chatId,
+			chatId: message.chatId,
 			audioUrl
 		})
 
 		const lastMessageContent = audioUrl
 			? 'Голосовое сообщение'
 			: message.content
-		await this.chatService.updateLastMessage(chatId, lastMessageContent)
+
+		const updateChat = await this.chatService.updateLastMessage(
+			message.chatId,
+			lastMessageContent
+		)
 
 		const sender = await this.userService.findOneById(message.senderId)
 		const receiver = await this.userService.findOneById(message.receiverId)
@@ -84,57 +80,61 @@ export class ChatGateway {
 			sender,
 			receiver,
 			replyToMessage,
-			audioUrl
+			audioUrl,
+			chatId: message.chatId
 		}
 
 		this.server.emit('receiveMessage', messageWithUsers)
-
-		const senderChats = await this.chatService.getAllChatsForUser(
-			message.senderId
-		)
-		const receiverChats = await this.chatService.getAllChatsForUser(
-			message.receiverId
-		)
-
-		this.server.to(`user_${message.senderId}`).emit('updateChats', senderChats)
-		this.server
-			.to(`user_${message.receiverId}`)
-			.emit('updateChats', receiverChats)
+		this.server.emit('updateChat', updateChat)
 	}
 
 	@SubscribeMessage('messageRead')
 	async handleMessageRead(
-		@MessageBody() { messageId, userId }: { messageId: number; userId: number }
+		@MessageBody()
+		{ messageId }: { messageId: number }
 	) {
-		await this.chatService.markMessagesAsRead(messageId, userId)
+		const message = await this.chatService.getMessageById(messageId)
 
+		if (message.isRead) return
+
+		await this.chatService.markMessagesAsRead(messageId)
 		const updatedMessage = await this.chatService.getMessageById(messageId)
+
 		this.server.emit('messageReadUpdate', updatedMessage)
 	}
-
 	@SubscribeMessage('typing')
 	async handleTyping(
-		@MessageBody('senderId') senderId: number,
+		@MessageBody()
+		body: {
+			senderId: number
+			chatId: number
+		},
 		@ConnectedSocket() client: Socket
 	): Promise<void> {
-		const sender = await this.userService.findOneById(senderId)
+		const sender = await this.userService.findOneById(body.senderId)
 
 		client.broadcast.emit('typing', {
 			senderName: sender.name,
-			senderId: senderId
+			senderId: body.senderId,
+			chatId: body.chatId
 		})
 	}
 
 	@SubscribeMessage('typingStopped')
 	async handleTypingStopped(
-		@MessageBody('senderId') senderId: number,
+		@MessageBody()
+		body: {
+			senderId: number
+			chatId: number
+		},
 		@ConnectedSocket() client: Socket
 	): Promise<void> {
-		const sender = await this.userService.findOneById(senderId)
+		const sender = await this.userService.findOneById(body.senderId)
 
 		client.broadcast.emit('typingStopped', {
 			senderName: sender.name,
-			senderId: senderId
+			senderId: body.senderId,
+			chatId: body.chatId
 		})
 	}
 }
