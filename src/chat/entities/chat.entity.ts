@@ -22,6 +22,12 @@ export class ChatEntity {
 	user2Id: number
 
 	@Column({ nullable: true })
+	lastSenderId: number
+
+	@Column({ nullable: true })
+	lastSenderName: string
+
+	@Column({ nullable: true })
 	lastMessage: string
 
 	@OneToMany(() => MessageEntity, message => message.chat)

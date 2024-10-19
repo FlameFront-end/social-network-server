@@ -54,19 +54,6 @@ export class ChatService {
 		})
 	}
 
-	async getChatId(
-		senderId: number,
-		receiverId: number
-	): Promise<number | null> {
-		const chat = await this.chatRepository.findOne({
-			where: [
-				{ user1Id: senderId, user2Id: receiverId },
-				{ user1Id: receiverId, user2Id: senderId }
-			]
-		})
-		return chat ? chat.id : null
-	}
-
 	async createChat(senderId: number, receiverId: number): Promise<ChatEntity> {
 		const newChat = this.chatRepository.create({
 			user1Id: senderId,
@@ -75,15 +62,21 @@ export class ChatService {
 
 		return await this.chatRepository.save(newChat)
 	}
-
-	async updateLastMessage(chatId: number, lastMessage: string) {
-		await this.chatRepository.update(chatId, { lastMessage })
+	async updateLastMessage(
+		chatId: number,
+		lastMessage: { senderId: number; senderName: string; content: string }
+	) {
+		await this.chatRepository.update(chatId, {
+			lastMessage: lastMessage.content,
+			lastSenderName: lastMessage.senderName,
+			lastSenderId: lastMessage.senderId
+		})
 
 		return await this.chatRepository.findOne({ where: { id: chatId } })
 	}
 
 	async getAllChatsForUser(userId: number) {
-		return this.chatRepository.find({
+		const chats = await this.chatRepository.find({
 			where: [{ user1Id: userId }, { user2Id: userId }],
 			relations: [
 				'messages',
@@ -94,9 +87,32 @@ export class ChatService {
 			],
 			order: { updateAt: 'DESC' }
 		})
+
+		return await Promise.all(
+			chats.map(async chat => {
+				const unreadCount = await this.getUnreadMessagesCount(chat.id, userId)
+				return {
+					...chat,
+					unreadCount
+				}
+			})
+		)
 	}
 
 	async markMessagesAsRead(messageId: number): Promise<void> {
 		await this.messageRepository.update(messageId, { isRead: true })
+	}
+
+	async getUnreadMessagesCount(
+		chatId: number,
+		userId: number
+	): Promise<number> {
+		return this.messageRepository.count({
+			where: {
+				chatId,
+				receiverId: userId,
+				isRead: false
+			}
+		})
 	}
 }

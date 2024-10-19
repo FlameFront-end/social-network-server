@@ -3,20 +3,20 @@ import {
 	SubscribeMessage,
 	MessageBody,
 	WebSocketServer,
-	ConnectedSocket
+	ConnectedSocket,
+	OnGatewayConnection,
+	OnGatewayDisconnect
 } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
 import { ChatService } from './chat.service'
 import { UserService } from '../user/user.service'
 import { v4 as uuidv4 } from 'uuid'
-import * as fs from 'fs'
-import * as path from 'path'
 import { BadRequestException } from '@nestjs/common'
 import * as Bytescale from '@bytescale/sdk'
 import nodeFetch from 'node-fetch'
 
 @WebSocketGateway({ cors: true })
-export class ChatGateway {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer() server: Server
 
 	constructor(
@@ -28,6 +28,28 @@ export class ChatGateway {
 		fetchApi: nodeFetch as any,
 		apiKey: process.env.BYTESCALE_API_KEY
 	})
+
+	private connectedUsers: Record<number, string> = {}
+
+	async handleConnection(@ConnectedSocket() client: Socket) {
+		const userId = Number(client.handshake.query.userId)
+		if (userId) {
+			this.connectedUsers[userId] = client.id
+		}
+	}
+
+	async handleDisconnect(@ConnectedSocket() client: Socket) {
+		const userId = Object.keys(this.connectedUsers).find(
+			key => this.connectedUsers[Number(key)] === client.id
+		)
+		if (userId) {
+			delete this.connectedUsers[Number(userId)]
+		}
+	}
+
+	async getSocketByUserId(userId: number): Promise<string | null> {
+		return this.connectedUsers[userId] || null
+	}
 
 	@SubscribeMessage('send-message')
 	async handleMessage(
@@ -41,6 +63,9 @@ export class ChatGateway {
 			replyToMessageId?: number
 		}
 	) {
+		const sender = await this.userService.findOneById(message.senderId)
+		const receiver = await this.userService.findOneById(message.receiverId)
+
 		let audioUrl = null
 		if (message.audio) {
 			const buffer = Buffer.from(message.audio)
@@ -70,11 +95,12 @@ export class ChatGateway {
 
 		const updateChat = await this.chatService.updateLastMessage(
 			message.chatId,
-			lastMessageContent
+			{
+				senderId: sender.id,
+				senderName: sender.name,
+				content: lastMessageContent
+			}
 		)
-
-		const sender = await this.userService.findOneById(message.senderId)
-		const receiver = await this.userService.findOneById(message.receiverId)
 
 		let replyToMessage = null
 		if (message.replyToMessageId) {
@@ -94,6 +120,27 @@ export class ChatGateway {
 
 		this.server.emit('receive-message', messageWithUsers)
 		this.server.emit('update-chat', updateChat)
+
+		const receiverSocket = await this.getSocketByUserId(message.receiverId)
+		if (receiverSocket) {
+			this.server.to(receiverSocket).emit('receive-message', messageWithUsers)
+		}
+
+		// Обновление количества непрочитанных сообщений
+		// const unreadCount = await this.chatService.getUnreadMessagesCount(
+		// 	message.chatId,
+		// 	message.receiverId
+		// )
+
+		// if (receiverSocket) {
+		// 	this.server.to(receiverSocket).emit('unread-messages-count', {
+		// 		chatId: message.chatId,
+		// 		unreadCount
+		// 	})
+		// }
+
+		// Глобальная рассылка обновления чата для всех
+		this.server.emit('update-chat', updateChat)
 	}
 
 	@SubscribeMessage('message-read')
@@ -109,7 +156,24 @@ export class ChatGateway {
 		const updatedMessage = await this.chatService.getMessageById(messageId)
 
 		this.server.emit('message-read', updatedMessage)
+
+		// const unreadCount = await this.chatService.getUnreadMessagesCount(
+		// 	updatedMessage.chatId,
+		// 	updatedMessage.receiverId
+		// )
+		//
+		// const receiverSocket = await this.getSocketByUserId(message.receiverId)
+		//
+		// console.log('receiverSocket', receiverSocket)
+		//
+		// if (receiverSocket) {
+		// 	this.server.to(receiverSocket).emit('unread-messages-count', {
+		// 		chatId: message.chatId,
+		// 		unreadCount
+		// 	})
+		// }
 	}
+
 	@SubscribeMessage('typing')
 	async handleTyping(
 		@MessageBody()
