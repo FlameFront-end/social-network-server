@@ -62,7 +62,8 @@ export class ChatService {
 		await this.chatRepository.update(chatId, {
 			lastMessage: content,
 			lastSenderName: senderName,
-			lastSenderId: senderId
+			lastSenderId: senderId,
+			updatedAt: new Date()
 		})
 
 		return await this.chatRepository.findOne({ where: { id: chatId } })
@@ -78,7 +79,7 @@ export class ChatService {
 				'user1',
 				'user2'
 			],
-			order: { updateAt: 'DESC' }
+			order: { updatedAt: 'DESC' }
 		})
 
 		return await Promise.all(

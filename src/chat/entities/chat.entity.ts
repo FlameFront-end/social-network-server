@@ -43,5 +43,5 @@ export class ChatEntity {
 	createdAt: Date
 
 	@UpdateDateColumn()
-	updateAt: Date
+	updatedAt: Date
 }

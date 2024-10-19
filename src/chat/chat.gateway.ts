@@ -116,6 +116,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			chatId: message.chatId
 		}
 
+		console.log('updateChat', updateChat)
+
 		this.server.emit('receive-message', messageWithUsers)
 		this.server.emit('update-chat', updateChat)
 
