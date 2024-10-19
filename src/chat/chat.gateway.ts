@@ -65,6 +65,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	) {
 		let audioUrl = null
 
+		const sender = await this.userService.findOneById(message.senderId)
+
 		if (message.audio) {
 			const buffer = Buffer.from(message.audio)
 			const fileName = `${uuidv4()}.webm`
@@ -110,6 +112,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			...savedMessage,
 			replyToMessage,
 			audioUrl,
+			sender,
 			chatId: message.chatId
 		}
 
