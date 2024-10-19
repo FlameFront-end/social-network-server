@@ -18,24 +18,18 @@ export class ChatController {
 
 	@Post('/create')
 	@UseGuards(JwtAuthGuard)
-	createChat(@Request() req, @Body() body: { receiverId: number }) {
-		return this.chatService.createChat(req.user.id, body.receiverId)
-	}
-
-	@Get(':userId1/:userId2')
-	getMessagesBetweenUsers(
-		@Param('userId1') userId1: string,
-		@Param('userId2') userId2: string
-	) {
-		return this.chatService.getMessagesBetweenUsers(
-			Number(userId1),
-			Number(userId2)
-		)
+	createChat(@Request() req, @Body() body: { user2Id: number }) {
+		return this.chatService.createChat(req.user.id, body.user2Id)
 	}
 
 	@Get('/my-chats')
 	@UseGuards(JwtAuthGuard)
 	getAllChats(@Request() req) {
-		return this.chatService.getAllChatsForUser(req.user.id)
+		return this.chatService.getAllChatsByUserId(req.user.id)
+	}
+
+	@Get('/:chatId/messages')
+	async getChatMessagesById(@Param('chatId') chatId: string) {
+		return await this.chatService.getChatMessagesById(+chatId)
 	}
 }

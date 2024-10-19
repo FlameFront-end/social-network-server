@@ -63,10 +63,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			replyToMessageId?: number
 		}
 	) {
-		const sender = await this.userService.findOneById(message.senderId)
-		const receiver = await this.userService.findOneById(message.receiverId)
-
 		let audioUrl = null
+
 		if (message.audio) {
 			const buffer = Buffer.from(message.audio)
 			const fileName = `${uuidv4()}.webm`
@@ -83,6 +81,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				throw new BadRequestException(`Audio upload failed: ${error.message}`)
 			}
 		}
+
 		const savedMessage = await this.chatService.saveMessage({
 			...message,
 			chatId: message.chatId,
@@ -95,11 +94,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		const updateChat = await this.chatService.updateLastMessage(
 			message.chatId,
-			{
-				senderId: sender.id,
-				senderName: sender.name,
-				content: lastMessageContent
-			}
+			message.senderId,
+			'senderName',
+			lastMessageContent
 		)
 
 		let replyToMessage = null
@@ -111,8 +108,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		const messageWithUsers = {
 			...savedMessage,
-			sender,
-			receiver,
 			replyToMessage,
 			audioUrl,
 			chatId: message.chatId
@@ -138,9 +133,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// 		unreadCount
 		// 	})
 		// }
-
-		// Глобальная рассылка обновления чата для всех
-		this.server.emit('update-chat', updateChat)
 	}
 
 	@SubscribeMessage('message-read')
