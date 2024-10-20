@@ -10,8 +10,6 @@ async function bootstrap() {
 
 	app.enableCors({ credentials: true, origin: true })
 
-	app.use('/uploads', express.static(join(__dirname, '..', 'uploads')))
-
 	const config = new DocumentBuilder()
 		.setTitle('Social network')
 		.setVersion('1.0')

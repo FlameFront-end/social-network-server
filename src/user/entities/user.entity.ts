@@ -56,8 +56,8 @@ export class UserEntity {
 	@ManyToMany(() => MessageEntity, message => message.sender)
 	sentMessages: MessageEntity[]
 
-	@ManyToMany(() => MessageEntity, message => message.receiver)
-	receivedMessages: MessageEntity[]
+	// @ManyToMany(() => MessageEntity, message => message.receiver)
+	// receivedMessages: MessageEntity[]
 
 	@ManyToMany(() => ChatEntity, chat => chat.user1)
 	chatsAsUser1: ChatEntity[]

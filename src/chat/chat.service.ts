@@ -23,7 +23,7 @@ export class ChatService {
 			where: {
 				id: chatId
 			},
-			relations: ['messages.sender', 'messages.receiver']
+			relations: ['messages.sender']
 		})
 
 		return chat ? chat.messages : []
@@ -43,13 +43,7 @@ export class ChatService {
 	async getMessageById(messageId: number): Promise<MessageEntity> {
 		return this.messageRepository.findOne({
 			where: { id: messageId },
-			relations: [
-				'sender',
-				'receiver',
-				'replyToMessage',
-				'replyToMessage.sender',
-				'replyToMessage.receiver'
-			]
+			relations: ['sender', 'replyToMessage', 'replyToMessage.sender']
 		})
 	}
 
@@ -72,13 +66,7 @@ export class ChatService {
 	async getAllChatsByUserId(userId: number) {
 		const chats = await this.chatRepository.find({
 			where: [{ user1Id: userId }, { user2Id: userId }],
-			relations: [
-				'messages',
-				'messages.sender',
-				'messages.receiver',
-				'user1',
-				'user2'
-			],
+			relations: ['messages', 'messages.sender', 'user1', 'user2'],
 			order: { updatedAt: 'DESC' }
 		})
 

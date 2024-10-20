@@ -45,8 +45,8 @@ export class MessageEntity {
 	@ManyToOne(() => UserEntity, user => user.sentMessages)
 	sender: UserEntity
 
-	@ManyToOne(() => UserEntity, user => user.receivedMessages)
-	receiver: UserEntity
+	// @ManyToOne(() => UserEntity, user => user.receivedMessages)
+	// receiver: UserEntity
 
 	@ManyToOne(() => ChatEntity, chat => chat.messages)
 	chat: ChatEntity

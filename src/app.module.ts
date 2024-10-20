@@ -29,6 +29,7 @@ import { PostsEntity } from './posts/entities/posts.entity'
 		MailModule,
 		FriendsModule,
 		OnlineStatusModule,
+		PostsModule,
 		ConfigModule.forRoot({
 			envFilePath: `.env.${process.env.NODE_ENV}`
 		}),
@@ -68,8 +69,7 @@ import { PostsEntity } from './posts/entities/posts.entity'
 			UserDetailsEntity,
 			CommentsEntity,
 			PostsEntity
-		]),
-		PostsModule
+		])
 	],
 	controllers: [],
 	providers: [ChatGateway, ChatService, OnlineStatusGateway]
