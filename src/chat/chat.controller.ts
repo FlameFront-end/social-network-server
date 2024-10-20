@@ -28,8 +28,11 @@ export class ChatController {
 		return this.chatService.getAllChatsByUserId(req.user.id)
 	}
 
-	@Get('/:chatId/messages')
-	async getChatMessagesById(@Param('chatId') chatId: string) {
-		return await this.chatService.getChatMessagesById(+chatId)
+	@Get('/:chatId/info/:userId')
+	async getChatMessagesById(
+		@Param('chatId') chatId: string,
+		@Param('userId') userId: string
+	) {
+		return await this.chatService.getChatInfoById(+chatId, +userId)
 	}
 }

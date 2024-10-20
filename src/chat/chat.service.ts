@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { MessageEntity } from './entities/message.entity'
 import { ChatEntity } from './entities/chat.entity'
+import { UserEntity } from '../user/entities/user.entity'
 
 @Injectable()
 export class ChatService {
@@ -18,15 +19,26 @@ export class ChatService {
 		return await this.chatRepository.save(newChat)
 	}
 
-	async getChatMessagesById(chatId: number): Promise<MessageEntity[]> {
+	async getChatInfoById(
+		chatId: number,
+		userId: number
+	): Promise<{
+		interlocutor: UserEntity
+		messages: MessageEntity[]
+	}> {
 		const chat = await this.chatRepository.findOne({
 			where: {
 				id: chatId
 			},
-			relations: ['messages.sender']
+			relations: ['messages.sender', 'user1', 'user2']
 		})
 
-		return chat ? chat.messages : []
+		const interlocutor = chat.user1Id === userId ? chat.user2 : chat.user1
+
+		return {
+			interlocutor,
+			messages: chat ? chat.messages : []
+		}
 	}
 
 	async saveMessage(messageData: {
@@ -66,16 +78,22 @@ export class ChatService {
 	async getAllChatsByUserId(userId: number) {
 		const chats = await this.chatRepository.find({
 			where: [{ user1Id: userId }, { user2Id: userId }],
-			relations: ['messages', 'messages.sender', 'user1', 'user2'],
+			relations: ['user1', 'user2'],
 			order: { updatedAt: 'DESC' }
 		})
 
 		return await Promise.all(
 			chats.map(async chat => {
 				const unreadCount = await this.getUnreadMessagesCount(chat.id, userId)
+				const interlocutor = chat.user1Id === userId ? chat.user2 : chat.user1
+
+				delete chat.user2
+				delete chat.user1
+
 				return {
 					...chat,
-					unreadCount
+					unreadCount,
+					interlocutor
 				}
 			})
 		)
