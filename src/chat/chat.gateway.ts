@@ -97,7 +97,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const updateChat = await this.chatService.updateLastMessage(
 			message.chatId,
 			message.senderId,
-			'senderName',
+			sender.name,
 			lastMessageContent
 		)
 
@@ -205,5 +205,53 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			senderId: body.senderId,
 			chatId: body.chatId
 		})
+	}
+
+	@SubscribeMessage('start-video-chat')
+	async handleStartVideoChat(
+		@MessageBody() data: { receiverId: number },
+		@ConnectedSocket() client: Socket
+	) {
+		const otherUserSocket = await this.getSocketByUserId(data.receiverId)
+		console.log('data.receiverId', data.receiverId)
+		console.log('otherUserSocket', otherUserSocket)
+		if (otherUserSocket) {
+			this.server.to(otherUserSocket).emit('start-video-chat')
+		}
+	}
+
+	@SubscribeMessage('video-offer')
+	async handleVideoOffer(
+		@MessageBody()
+		data: { offer: RTCSessionDescriptionInit; receiverId: number },
+		@ConnectedSocket() client: Socket
+	) {
+		const otherUserSocket = await this.getSocketByUserId(data.receiverId)
+		if (otherUserSocket) {
+			this.server.to(otherUserSocket).emit('video-offer', data)
+		}
+	}
+
+	@SubscribeMessage('video-answer')
+	async handleVideoAnswer(
+		@MessageBody()
+		data: { answer: RTCSessionDescriptionInit; receiverId: number },
+		@ConnectedSocket() client: Socket
+	) {
+		const otherUserSocket = await this.getSocketByUserId(data.receiverId)
+		if (otherUserSocket) {
+			this.server.to(otherUserSocket).emit('video-answer', data)
+		}
+	}
+
+	@SubscribeMessage('ice-candidate')
+	async handleIceCandidate(
+		@MessageBody() data: { candidate: RTCIceCandidateInit; receiverId: number },
+		@ConnectedSocket() client: Socket
+	) {
+		const otherUserSocket = await this.getSocketByUserId(data.receiverId)
+		if (otherUserSocket) {
+			this.server.to(otherUserSocket).emit('ice-candidate', data)
+		}
 	}
 }

@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { JwtModule } from '@nestjs/jwt'
 import { AuthModule } from './auth/auth.module'
 import { UserEntity } from './user/entities/user.entity'
 import { UserModule } from './user/user.module'
-import { ConfigModule, ConfigService } from '@nestjs/config'
 import { ChatModule } from './chat/chat.module'
 import { ChatService } from './chat/chat.service'
 import { UploadModule } from './upload/upload.module'
@@ -15,10 +16,13 @@ import { MailModule } from './mail/mail.module'
 import { UserDetailsEntity } from './user/entities/user-details.entity'
 import { OnlineStatusGateway } from './online-status/online-status.gateway'
 import { OnlineStatusModule } from './online-status/online-status.module'
-import { JwtModule } from '@nestjs/jwt'
 import { PostsModule } from './posts/posts.module'
 import { CommentsEntity } from './posts/entities/comments.entity'
 import { PostsEntity } from './posts/entities/posts.entity'
+import { TeachersModule } from './teachers/teachers.module'
+import { TeacherEntity } from './teachers/entities/teacher.entity'
+import { StudentsModule } from './students/students.module'
+import { StudentEntity } from './students/entities/student.entity'
 
 @Module({
 	imports: [
@@ -46,7 +50,9 @@ import { PostsEntity } from './posts/entities/posts.entity'
 				UserEntity,
 				UserDetailsEntity,
 				CommentsEntity,
-				PostsEntity
+				PostsEntity,
+				TeacherEntity,
+				StudentEntity
 			],
 			synchronize: true,
 			ssl:
@@ -68,8 +74,12 @@ import { PostsEntity } from './posts/entities/posts.entity'
 			UserEntity,
 			UserDetailsEntity,
 			CommentsEntity,
-			PostsEntity
-		])
+			PostsEntity,
+			TeacherEntity,
+			StudentEntity
+		]),
+		TeachersModule,
+		StudentsModule
 	],
 	controllers: [],
 	providers: [ChatGateway, ChatService, OnlineStatusGateway]
