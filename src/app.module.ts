@@ -23,6 +23,9 @@ import { TeachersModule } from './teachers/teachers.module'
 import { TeacherEntity } from './teachers/entities/teacher.entity'
 import { StudentsModule } from './students/students.module'
 import { StudentEntity } from './students/entities/student.entity'
+import { GroupsModule } from './groups/groups.module'
+import { GroupEntity } from './groups/entities/group.entity'
+import { ScheduleEntity } from './groups/entities/schedule.entity'
 
 @Module({
 	imports: [
@@ -52,7 +55,9 @@ import { StudentEntity } from './students/entities/student.entity'
 				CommentsEntity,
 				PostsEntity,
 				TeacherEntity,
-				StudentEntity
+				StudentEntity,
+				GroupEntity,
+				ScheduleEntity
 			],
 			synchronize: true,
 			ssl:
@@ -76,10 +81,13 @@ import { StudentEntity } from './students/entities/student.entity'
 			CommentsEntity,
 			PostsEntity,
 			TeacherEntity,
-			StudentEntity
+			StudentEntity,
+			GroupEntity,
+			ScheduleEntity
 		]),
 		TeachersModule,
-		StudentsModule
+		StudentsModule,
+		GroupsModule
 	],
 	controllers: [],
 	providers: [ChatGateway, ChatService, OnlineStatusGateway]

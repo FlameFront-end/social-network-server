@@ -11,7 +11,6 @@ import { TeachersService } from './teachers.service'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import { TeacherEntity } from './entities/teacher.entity'
 import { ApiTags } from '@nestjs/swagger'
-import { StudentEntity } from '../students/entities/student.entity'
 import { UpdateTeacherDto } from './dto/update-teacher.dto'
 
 @ApiTags('teachers')
@@ -39,7 +38,7 @@ export class TeachersController {
 	@Patch(':id')
 	async update(
 		@Param('id') id: string,
-		@Body() updateTeacherDto: Partial<UpdateTeacherDto>
+		@Body() updateTeacherDto: UpdateTeacherDto
 	): Promise<TeacherEntity> {
 		return this.teachersService.update(id, updateTeacherDto)
 	}

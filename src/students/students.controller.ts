@@ -38,7 +38,7 @@ export class StudentsController {
 	@Patch(':id')
 	async update(
 		@Param('id') id: string,
-		@Body() updateStudentDto: Partial<UpdateStudentDto>
+		@Body() updateStudentDto: UpdateStudentDto
 	): Promise<StudentEntity> {
 		return this.studentsService.update(id, updateStudentDto)
 	}
